@@ -141,6 +141,42 @@
             color: var(--text-secondary);
         }
 
+        .stat-card {
+            cursor: pointer;
+            transition: transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+        }
+        .stat-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 12px 40px rgba(16, 185, 129, 0.18);
+        }
+        .stat-card:focus-visible {
+            outline: 2px solid var(--primary-accent);
+            outline-offset: 3px;
+        }
+        .dashboard-tooltip {
+            position: fixed;
+            z-index: 9999;
+            background: #1e293b;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 12px 16px;
+            min-width: 180px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+            backdrop-filter: blur(12px);
+            font-size: 11px;
+            line-height: 1.6;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.18s ease;
+        }
+        .dashboard-tooltip.show { opacity: 1; }
+        .dashboard-tooltip .dt-label { color: #94a3b8; font-weight: 500; display: inline-block; min-width: 80px; }
+        .dashboard-tooltip .dt-value { color: #f8fafc; font-weight: 600; }
+        .dashboard-tooltip .dt-title { font-weight: 600; color: #f8fafc; font-size: 12px; margin-bottom: 2px; }
+        .dashboard-tooltip .dt-desc { font-size: 10px; color: #64748b; margin-bottom: 6px; }
+        .dashboard-tooltip .dt-divider { border-top: 1px solid rgba(255,255,255,0.06); margin: 5px 0; }
+
         .menu-group-header {
             font-size: 9px;
             font-weight: 700;
@@ -1317,7 +1353,7 @@ table.admin-table tbody tr:hover td {
                    ========================================================================== -->
                 <div class="tab-pane active-pane" id="tab-dashboard">
                     <div class="dashboard-grid">
-                        <div class="stat-card">
+                        <div class="stat-card" tabindex="0" role="button" data-card="today-sales" onmouseenter="showDashTooltip(event,'today-sales')" onmouseleave="hideDashTooltip()" onclick="openDashboardDetail('today-sales')">
                             <div class="stat-info">
                                <h3>Today's Sales</h3>
                                <p id="stat-today-sales">৳ 0</p>
@@ -1327,7 +1363,7 @@ table.admin-table tbody tr:hover td {
                                 <div class="stat-icon">&#128181;</div>
                             </div>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card" tabindex="0" role="button" data-card="today-bookings" onmouseenter="showDashTooltip(event,'today-bookings')" onmouseleave="hideDashTooltip()" onclick="openDashboardDetail('today-bookings')">
                             <div class="stat-info">
                                <h3>Today's Bookings</h3>
                                <p id="stat-today-bookings">0</p>
@@ -1337,7 +1373,7 @@ table.admin-table tbody tr:hover td {
                                 <div class="stat-icon">&#9917;</div>
                             </div>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card" tabindex="0" role="button" data-card="monthly-sales" onmouseenter="showDashTooltip(event,'monthly-sales')" onmouseleave="hideDashTooltip()" onclick="openDashboardDetail('monthly-sales')">
                             <div class="stat-info">
                                <h3>Monthly Sales</h3>
                                <p id="stat-monthly-sales">৳ 0</p>
@@ -1347,7 +1383,7 @@ table.admin-table tbody tr:hover td {
                                 <div class="stat-icon">&#128200;</div>
                             </div>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card" tabindex="0" role="button" data-card="monthly-profit" onmouseenter="showDashTooltip(event,'monthly-profit')" onmouseleave="hideDashTooltip()" onclick="openDashboardDetail('monthly-profit')">
                             <div class="stat-info">
                                <h3>Monthly Profit</h3>
                                <p id="stat-monthly-profit">৳ 0</p>
@@ -1357,7 +1393,7 @@ table.admin-table tbody tr:hover td {
                                 <div class="stat-icon">&#128186;</div>
                             </div>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card" tabindex="0" role="button" data-card="total-due" onmouseenter="showDashTooltip(event,'total-due')" onmouseleave="hideDashTooltip()" onclick="openDashboardDetail('total-due')">
                             <div class="stat-info">
                                <h3>Total Due Amount</h3>
                                <p id="stat-total-due" style="color: #ef4444;">৳ 0</p>
@@ -1367,7 +1403,7 @@ table.admin-table tbody tr:hover td {
                                 <div class="stat-icon" style="color: #ef4444;">&#128148;</div>
                             </div>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card" tabindex="0" role="button" data-card="pending-bookings" onmouseenter="showDashTooltip(event,'pending-bookings')" onmouseleave="hideDashTooltip()" onclick="openDashboardDetail('pending-bookings')">
                             <div class="stat-info">
                                <h3>Pending Bookings</h3>
                                <p id="stat-pending-bookings" style="color: #f59e0b;">0</p>
@@ -2633,9 +2669,11 @@ table.admin-table tbody tr:hover td {
         <div class="login-card" style="position:relative; max-width: 450px;" id="sysModalInnerCard">
             <h3 id="modalAlertTitle" style="font-size:18px; font-weight:700; margin-bottom:12px">Alert Notification</h3>
             <div id="modalAlertBody" style="font-size:13px; color:var(--text-secondary); margin-bottom:20px; text-align: left;"></div>
-            <button class="btn-action" onclick="closeModalAlert()" style="margin-top:0">Acknowledge</button>
+            <button class="btn-action" id="modalActionBtn" onclick="closeModalAlert()" style="margin-top:0">Acknowledge</button>
         </div>
     </div>
+
+    <div id="dashboardTooltip" class="dashboard-tooltip"></div>
 
     <div id="printAreaContainer" style="display:none;">
         <div id="printTargetContent"></div>
@@ -2819,6 +2857,10 @@ table.admin-table tbody tr:hover td {
 
         function closeModalAlert() {
             if (sysModal) sysModal.style.display = "none";
+            var mic = document.getElementById("sysModalInnerCard");
+            if (mic) mic.style.maxWidth = "450px";
+            var mab = document.getElementById("modalActionBtn");
+            if (mab) mab.textContent = "Acknowledge";
         }
 
         if (closeModalBtn) {
@@ -3279,11 +3321,296 @@ table.admin-table tbody tr:hover td {
                 <div class="chart-column" style="height: ${Math.min(monthlyExpensesTotal * 0.02 || 8, 100)}%" data-value="${monthlyExpensesTotal}"><span>Expenses</span></div>
                 <div class="chart-column" style="height: ${Math.min(dbUsers.length * 15, 100)}%" data-value="${dbUsers.length}"><span>Profiles</span></div>
             `;
+
+            const yesterdayDate = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+            const yesterdayInvoices = dbSales.filter(s => s.dateTime.startsWith(yesterdayDate));
+            const yesterdaySales = yesterdayInvoices.reduce((sum, s) => sum + s.total, 0);
+            const yesterdayQS = dbQuickSales.filter(q => q.date === yesterdayDate);
+            const yesterdayQSTotal = yesterdayQS.reduce((sum, q) => sum + q.amount, 0);
+            const grandYesterdaySales = yesterdaySales + yesterdayQSTotal;
+            const todaySalesGrowth = grandYesterdaySales > 0 ? ((grandTodaySales - grandYesterdaySales) / grandYesterdaySales * 100).toFixed(1) : '0.0';
+            const todaySalesGrowthColor = grandTodaySales >= grandYesterdaySales ? '#10B981' : '#ef4444';
+            const todaySalesGrowthArrow = grandTodaySales >= grandYesterdaySales ? '\u2191' : '\u2193';
+
+            const yesterdayOnline = dbTurfBookings.filter(b => b.date === yesterdayDate).length;
+            const yesterdayManual = dbManualBookings.filter(b => b.date === yesterdayDate).length;
+            const yesterdayBookings = yesterdayOnline + yesterdayManual;
+            const todayBookingsCount = todayOnlineCount + todayManualCount;
+            const bookingsGrowth = yesterdayBookings > 0 ? ((todayBookingsCount - yesterdayBookings) / yesterdayBookings * 100).toFixed(1) : '0.0';
+            const bookingsGrowthColor = todayBookingsCount >= yesterdayBookings ? '#10B981' : '#ef4444';
+            const bookingsArrow = todayBookingsCount >= yesterdayBookings ? '\u2191' : '\u2193';
+
+            const lastMonthPrefix = new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().slice(0, 7);
+            const prevMonthInvoices = dbSales.filter(s => s.dateTime.startsWith(lastMonthPrefix));
+            const prevMonthSales = prevMonthInvoices.reduce((sum, s) => sum + s.total, 0);
+            const prevMonthQS = dbQuickSales.filter(q => q.date.startsWith(lastMonthPrefix));
+            const prevMonthQSTotal = prevMonthQS.reduce((sum, q) => sum + q.amount, 0);
+            const grandPrevMonthSales = prevMonthSales + prevMonthQSTotal;
+            const monthlySalesGrowth = grandPrevMonthSales > 0 ? ((grandMonthlySales - grandPrevMonthSales) / grandPrevMonthSales * 100).toFixed(1) : '0.0';
+            const monthlySalesGrowthColor = grandMonthlySales >= grandPrevMonthSales ? '#10B981' : '#ef4444';
+            const monthlySalesArrow = grandMonthlySales >= grandPrevMonthSales ? '\u2191' : '\u2193';
+
+            const prevMonthIncomes = dbAccounting.incomes.filter(i => i.date.startsWith(lastMonthPrefix));
+            const prevMonthIncomesTotal = prevMonthIncomes.reduce((sum, i) => sum + i.amount, 0);
+            const prevMonthExpenses = dbAccounting.expenses.filter(e => e.date.startsWith(lastMonthPrefix));
+            const prevMonthExpensesTotal = prevMonthExpenses.reduce((sum, e) => sum + e.amount, 0);
+            const prevMonthQSVal = prevMonthQS.reduce((sum, q) => sum + q.amount, 0);
+            const prevNetProfit = (prevMonthIncomesTotal + prevMonthQSVal) - prevMonthExpensesTotal;
+            const profitGrowth = prevNetProfit !== 0 ? (((netProfit - prevNetProfit) / Math.abs(prevNetProfit)) * 100).toFixed(1) : '0.0';
+            const profitGrowthColor = netProfit >= prevNetProfit ? '#10B981' : '#ef4444';
+            const profitArrow = netProfit >= prevNetProfit ? '\u2191' : '\u2193';
+
+            const prevDueSales = dbSales.filter(s => new Date(s.dateTime).getTime() < Date.now() - 86400000).reduce((sum, s) => sum + s.due, 0);
+            const prevDueBookings = dbManualBookings.filter(b => { try { return new Date(b.date).getTime() < Date.now() - 86400000; } catch(e) { return false; } }).reduce((sum, b) => sum + b.due, 0);
+            const prevTotalDue = prevDueSales + prevDueBookings;
+            const totalDueCurrent = salesDue + bookingDue;
+            const dueGrowth = prevTotalDue > 0 ? ((totalDueCurrent - prevTotalDue) / prevTotalDue * 100).toFixed(1) : '0.0';
+            const dueGrowthColor = totalDueCurrent <= prevTotalDue ? '#10B981' : '#ef4444';
+            const dueArrow = totalDueCurrent <= prevTotalDue ? '\u2193' : '\u2191';
+
+            const prevPendingOnline = dbTurfBookings.filter(b => { try { return new Date(b.date).getTime() < Date.now() - 86400000; } catch(e) { return false; } }).filter(b => b.status === "pending").length;
+            const prevPendingManual = dbManualBookings.filter(b => { try { return new Date(b.date).getTime() < Date.now() - 86400000; } catch(e) { return false; } }).filter(b => b.status === "pending").length;
+            const prevPendingTotal = prevPendingOnline + prevPendingManual;
+            const pendingCurrent = pendingOnlineCount + pendingManualCount;
+            const pendingGrowth = prevPendingTotal > 0 ? ((pendingCurrent - prevPendingTotal) / prevPendingTotal * 100).toFixed(1) : '0.0';
+            const pendingGrowthColor = pendingCurrent <= prevPendingTotal ? '#10B981' : '#ef4444';
+            const pendingArrow = pendingCurrent <= prevPendingTotal ? '\u2193' : '\u2191';
+
+            const nowTime = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            window.__dashTTData = {
+                'today-sales': {
+                    title: "Today's Sales Revenue",
+                    desc: 'Total sales from restaurant invoices & quick sales today',
+                    current: '\u09F3 ' + grandTodaySales.toLocaleString(),
+                    previous: '\u09F3 ' + grandYesterdaySales.toLocaleString(),
+                    growth: todaySalesArrow + ' ' + todaySalesGrowth + '%',
+                    growthColor: todaySalesGrowthColor,
+                    updated: nowTime
+                },
+                'today-bookings': {
+                    title: "Today's Bookings",
+                    desc: 'Online turf & manual bookings registered today',
+                    current: String(todayBookingsCount),
+                    previous: String(yesterdayBookings),
+                    growth: bookingsArrow + ' ' + bookingsGrowth + '%',
+                    growthColor: bookingsGrowthColor,
+                    updated: nowTime
+                },
+                'monthly-sales': {
+                    title: 'Monthly Sales Revenue',
+                    desc: 'Total sales from invoices & quick sales this month',
+                    current: '\u09F3 ' + grandMonthlySales.toLocaleString(),
+                    previous: '\u09F3 ' + grandPrevMonthSales.toLocaleString(),
+                    growth: monthlySalesArrow + ' ' + monthlySalesGrowth + '%',
+                    growthColor: monthlySalesGrowthColor,
+                    updated: nowTime
+                },
+                'monthly-profit': {
+                    title: 'Monthly Net Profit',
+                    desc: 'Net profit (total income minus expenses) this month',
+                    current: '\u09F3 ' + netProfit.toLocaleString(),
+                    previous: '\u09F3 ' + prevNetProfit.toLocaleString(),
+                    growth: profitArrow + ' ' + profitGrowth + '%',
+                    growthColor: profitGrowthColor,
+                    updated: nowTime
+                },
+                'total-due': {
+                    title: 'Total Due Amount',
+                    desc: 'Outstanding payments from sales invoices & bookings',
+                    current: '\u09F3 ' + totalDueCurrent.toLocaleString(),
+                    previous: '\u09F3 ' + prevTotalDue.toLocaleString(),
+                    growth: dueArrow + ' ' + dueGrowth + '%',
+                    growthColor: dueGrowthColor,
+                    updated: nowTime
+                },
+                'pending-bookings': {
+                    title: 'Pending Bookings',
+                    desc: 'Bookings awaiting confirmation or action',
+                    current: String(pendingCurrent),
+                    previous: String(prevPendingTotal),
+                    growth: pendingArrow + ' ' + pendingGrowth + '%',
+                    growthColor: pendingGrowthColor,
+                    updated: nowTime
+                }
+            };
+        }
+
+        function showDashTooltip(e, cardType) {
+            const tt = document.getElementById('dashboardTooltip');
+            const data = window.__dashTTData || {};
+            const info = data[cardType];
+            if (!tt || !info) return;
+
+            tt.innerHTML = '<div class="dt-title">' + info.title + '</div><div class="dt-desc">' + info.desc + '</div><div class="dt-divider"></div><div><span class="dt-label">Current:</span> <span class="dt-value">' + info.current + '</span></div><div><span class="dt-label">Previous:</span> <span class="dt-value">' + info.previous + '</span></div><div><span class="dt-label">Growth:</span> <span class="dt-value" style="color:' + info.growthColor + '">' + info.growth + '</span></div><div><span class="dt-label">Updated:</span> <span class="dt-value">' + info.updated + '</span></div>';
+
+            const rect = e.currentTarget.getBoundingClientRect();
+            let top = rect.top - tt.offsetHeight - 12;
+            let left = rect.left + rect.width / 2 - 100;
+            if (top < 10) top = rect.bottom + 12;
+            if (left < 10) left = 10;
+            if (left + 200 > window.innerWidth) left = window.innerWidth - 210;
+
+            tt.style.top = top + 'px';
+            tt.style.left = left + 'px';
+            tt.classList.add('show');
+        }
+
+        function hideDashTooltip() {
+            const tt = document.getElementById('dashboardTooltip');
+            if (tt) tt.classList.remove('show');
+        }
+
+        function openDashboardDetail(cardType) {
+            const modal = document.getElementById('systemModal');
+            const innerCard = document.getElementById('sysModalInnerCard');
+            const title = document.getElementById('modalAlertTitle');
+            const body = document.getElementById('modalAlertBody');
+            if (!modal || !body) return;
+
+            innerCard.style.maxWidth = '750px';
+            title.innerText = cardType.replace(/-/g, ' ').replace(/\b\w/g, function(l) { return l.toUpperCase(); }) + ' — Detailed View';
+
+            const btn = document.getElementById('modalActionBtn');
+            if (btn) btn.textContent = 'Close';
+
+            body.innerHTML = '<div style="text-align:center;padding:40px"><div style="width:36px;height:36px;border:3px solid rgba(16,185,129,0.2);border-top:3px solid #10B981;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto"></div><p style="margin-top:16px;color:var(--text-secondary);font-size:13px;">Loading data...</p></div>';
+            modal.style.display = 'flex';
+
+            setTimeout(function() {
+                body.innerHTML = generateDashDetailHtml(cardType);
+            }, 350);
+        }
+
+        function generateDashDetailHtml(cardType) {
+            const todayStr = new Date().toISOString().slice(0, 10);
+            const monthPrefix = todayStr.slice(0, 7);
+
+            switch (cardType) {
+                case 'today-sales': {
+                    const invoices = dbSales.filter(function(s) { return s.dateTime.startsWith(todayStr); });
+                    const qs = dbQuickSales.filter(function(q) { return q.date === todayStr; });
+                    const invTotal = invoices.reduce(function(s, v) { return s + v.total; }, 0);
+                    const qsTotal = qs.reduce(function(s, v) { return s + v.amount; }, 0);
+                    var html = '<div style="max-height:420px;overflow-y:auto;">';
+                    html += '<div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;"><div style="flex:1;min-width:120px;padding:12px;background:rgba(16,185,129,0.06);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--text-secondary)">Invoices Total</div><div style="font-size:18px;font-weight:700;color:var(--primary-accent);margin-top:4px;">\u09F3 ' + invTotal.toLocaleString() + '</div></div><div style="flex:1;min-width:120px;padding:12px;background:rgba(16,185,129,0.06);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--text-secondary)">Quick Sales Total</div><div style="font-size:18px;font-weight:700;color:var(--primary-accent);margin-top:4px;">\u09F3 ' + qsTotal.toLocaleString() + '</div></div><div style="flex:1;min-width:120px;padding:12px;background:rgba(16,185,129,0.06);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--text-secondary)">Grand Total</div><div style="font-size:18px;font-weight:700;color:var(--primary-accent);margin-top:4px;">\u09F3 ' + (invTotal + qsTotal).toLocaleString() + '</div></div></div>';
+                    html += '<h4 style="margin:0 0 8px;font-size:13px;">Restaurant Invoices (' + invoices.length + ')</h4>';
+                    if (invoices.length === 0) { html += '<p style="color:var(--text-secondary);font-size:12px;margin-bottom:12px;">No restaurant invoices today.</p>'; } else {
+                        html += '<table class="admin-table" style="font-size:11px;"><thead><tr><th>Invoice</th><th>Customer</th><th style="text-align:right;">Amount</th></tr></thead><tbody>';
+                        for (var i = 0; i < invoices.length; i++) { html += '<tr><td>' + invoices[i].invoiceNo + '</td><td>' + invoices[i].customerName + '</td><td style="text-align:right;font-weight:600;color:var(--primary-accent)">\u09F3 ' + invoices[i].total.toLocaleString() + '</td></tr>'; }
+                        html += '</tbody></table>';
+                    }
+                    html += '<h4 style="margin:14px 0 8px;font-size:13px;">Quick Sales (' + qs.length + ')</h4>';
+                    if (qs.length === 0) { html += '<p style="color:var(--text-secondary);font-size:12px;">No quick sales today.</p>'; } else {
+                        html += '<table class="admin-table" style="font-size:11px;"><thead><tr><th>ID</th><th>Time</th><th style="text-align:right;">Amount</th></tr></thead><tbody>';
+                        for (var j = 0; j < qs.length; j++) { html += '<tr><td>' + qs[j].id + '</td><td>' + (qs[j].time || 'N/A') + '</td><td style="text-align:right;font-weight:600;color:var(--primary-accent)">\u09F3 ' + qs[j].amount.toLocaleString() + '</td></tr>'; }
+                        html += '</tbody></table>';
+                    }
+                    html += '</div>';
+                    return html;
+                }
+                case 'today-bookings': {
+                    var online = dbTurfBookings.filter(function(b) { return b.date === todayStr; });
+                    var manual = dbManualBookings.filter(function(b) { return b.date === todayStr; });
+                    var h = '<div style="max-height:420px;overflow-y:auto;">';
+                    h += '<div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;"><div style="flex:1;min-width:120px;padding:12px;background:rgba(16,185,129,0.06);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--text-secondary)">Online</div><div style="font-size:18px;font-weight:700;color:var(--primary-accent);margin-top:4px;">' + online.length + '</div></div><div style="flex:1;min-width:120px;padding:12px;background:rgba(16,185,129,0.06);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--text-secondary)">Manual</div><div style="font-size:18px;font-weight:700;color:var(--primary-accent);margin-top:4px;">' + manual.length + '</div></div><div style="flex:1;min-width:120px;padding:12px;background:rgba(16,185,129,0.06);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--text-secondary)">Total</div><div style="font-size:18px;font-weight:700;color:var(--primary-accent);margin-top:4px;">' + (online.length + manual.length) + '</div></div></div>';
+                    h += '<h4 style="margin:0 0 8px;font-size:13px;">Online Turf Bookings (' + online.length + ')</h4>';
+                    if (online.length === 0) { h += '<p style="color:var(--text-secondary);font-size:12px;margin-bottom:12px;">No online bookings today.</p>'; } else {
+                        h += '<table class="admin-table" style="font-size:11px;"><thead><tr><th>Slot</th><th>Customer</th><th>Status</th></tr></thead><tbody>';
+                        for (var k = 0; k < online.length; k++) { h += '<tr><td>' + (online[k].slot || 'N/A') + '</td><td>' + (online[k].customerName || 'N/A') + '</td><td>' + (online[k].status || 'N/A') + '</td></tr>'; }
+                        h += '</tbody></table>';
+                    }
+                    h += '<h4 style="margin:14px 0 8px;font-size:13px;">Manual Bookings (' + manual.length + ')</h4>';
+                    if (manual.length === 0) { h += '<p style="color:var(--text-secondary);font-size:12px;">No manual bookings today.</p>'; } else {
+                        h += '<table class="admin-table" style="font-size:11px;"><thead><tr><th>Slot</th><th>Customer</th><th>Status</th></tr></thead><tbody>';
+                        for (var l = 0; l < manual.length; l++) { h += '<tr><td>' + (manual[l].slot || 'N/A') + '</td><td>' + (manual[l].customerName || 'N/A') + '</td><td>' + (manual[l].status || 'N/A') + '</td></tr>'; }
+                        h += '</tbody></table>';
+                    }
+                    h += '</div>';
+                    return h;
+                }
+                case 'monthly-sales': {
+                    var minv = dbSales.filter(function(s) { return s.dateTime.startsWith(monthPrefix); });
+                    var mqs = dbQuickSales.filter(function(q) { return q.date.startsWith(monthPrefix); });
+                    var minvTotal = minv.reduce(function(s, v) { return s + v.total; }, 0);
+                    var mqsTotal = mqs.reduce(function(s, v) { return s + v.amount; }, 0);
+                    var mh = '<div style="max-height:420px;overflow-y:auto;">';
+                    mh += '<div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;"><div style="flex:1;min-width:120px;padding:12px;background:rgba(16,185,129,0.06);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--text-secondary)">Invoices</div><div style="font-size:18px;font-weight:700;color:var(--primary-accent);margin-top:4px;">\u09F3 ' + minvTotal.toLocaleString() + '</div></div><div style="flex:1;min-width:120px;padding:12px;background:rgba(16,185,129,0.06);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--text-secondary)">Quick Sales</div><div style="font-size:18px;font-weight:700;color:var(--primary-accent);margin-top:4px;">\u09F3 ' + mqsTotal.toLocaleString() + '</div></div><div style="flex:1;min-width:120px;padding:12px;background:rgba(16,185,129,0.06);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--text-secondary)">Grand Total</div><div style="font-size:18px;font-weight:700;color:var(--primary-accent);margin-top:4px;">\u09F3 ' + (minvTotal + mqsTotal).toLocaleString() + '</div></div></div>';
+                    mh += '<p style="color:var(--text-secondary);font-size:12px;">' + minv.length + ' invoices and ' + mqs.length + ' quick sales this month.</p></div>';
+                    return mh;
+                }
+                case 'monthly-profit': {
+                    var minc = dbAccounting.incomes.filter(function(i) { return i.date.startsWith(monthPrefix); });
+                    var mexp = dbAccounting.expenses.filter(function(e) { return e.date.startsWith(monthPrefix); });
+                    var mincTotal = minc.reduce(function(s, v) { return s + v.amount; }, 0);
+                    var mexpTotal = mexp.reduce(function(s, v) { return s + v.amount; }, 0);
+                    var mmqsT = dbQuickSales.filter(function(q) { return q.date.startsWith(monthPrefix); }).reduce(function(s, v) { return s + v.amount; }, 0);
+                    var mnet = (mincTotal + mmqsT) - mexpTotal;
+                    var ph = '<div style="max-height:420px;overflow-y:auto;">';
+                    ph += '<div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;"><div style="flex:1;min-width:120px;padding:12px;background:rgba(16,185,129,0.06);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--text-secondary)">Income</div><div style="font-size:18px;font-weight:700;color:var(--primary-accent);margin-top:4px;">\u09F3 ' + (mincTotal + mmqsT).toLocaleString() + '</div></div><div style="flex:1;min-width:120px;padding:12px;background:rgba(239,68,68,0.06);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--text-secondary)">Expenses</div><div style="font-size:18px;font-weight:700;color:#ef4444;margin-top:4px;">\u09F3 ' + mexpTotal.toLocaleString() + '</div></div><div style="flex:1;min-width:120px;padding:12px;background:rgba(16,185,129,0.06);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--text-secondary)">Net Profit</div><div style="font-size:18px;font-weight:700;color:' + (mnet >= 0 ? 'var(--primary-accent)' : '#ef4444') + ';margin-top:4px;">\u09F3 ' + mnet.toLocaleString() + '</div></div></div>';
+                    ph += '<h4 style="margin:0 0 8px;font-size:13px;">Income Sources (' + (minc.length + 1) + ')</h4>';
+                    ph += '<table class="admin-table" style="font-size:11px;"><thead><tr><th>Source</th><th style="text-align:right;">Amount</th></tr></thead><tbody>';
+                    for (var mi = 0; mi < minc.length; mi++) { ph += '<tr><td>' + (minc[mi].source || 'N/A') + '</td><td style="text-align:right;font-weight:600;color:var(--primary-accent)">\u09F3 ' + minc[mi].amount.toLocaleString() + '</td></tr>'; }
+                    ph += '<tr><td>Quick Sales</td><td style="text-align:right;font-weight:600;color:var(--primary-accent)">\u09F3 ' + mmqsT.toLocaleString() + '</td></tr>';
+                    ph += '</tbody></table>';
+                    ph += '<h4 style="margin:14px 0 8px;font-size:13px;">Expenses (' + mexp.length + ')</h4>';
+                    if (mexp.length === 0) { ph += '<p style="color:var(--text-secondary);font-size:12px;">No expenses this month.</p>'; } else {
+                        ph += '<table class="admin-table" style="font-size:11px;"><thead><tr><th>Category</th><th style="text-align:right;">Amount</th></tr></thead><tbody>';
+                        for (var me = 0; me < mexp.length; me++) { ph += '<tr><td>' + (mexp[me].category || 'N/A') + '</td><td style="text-align:right;font-weight:600;color:#ef4444">\u09F3 ' + mexp[me].amount.toLocaleString() + '</td></tr>'; }
+                        ph += '</tbody></table>';
+                    }
+                    ph += '</div>';
+                    return ph;
+                }
+                case 'total-due': {
+                    var dueInvs = dbSales.filter(function(s) { return s.due > 0; });
+                    var dueBooks = dbManualBookings.filter(function(b) { return b.due > 0; });
+                    var sDue = dueInvs.reduce(function(s, v) { return s + v.due; }, 0);
+                    var bDue = dueBooks.reduce(function(s, v) { return s + v.due; }, 0);
+                    var dh = '<div style="max-height:420px;overflow-y:auto;">';
+                    dh += '<div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;"><div style="flex:1;min-width:120px;padding:12px;background:rgba(239,68,68,0.06);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--text-secondary)">Sales Due</div><div style="font-size:18px;font-weight:700;color:#ef4444;margin-top:4px;">\u09F3 ' + sDue.toLocaleString() + '</div></div><div style="flex:1;min-width:120px;padding:12px;background:rgba(239,68,68,0.06);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--text-secondary)">Booking Due</div><div style="font-size:18px;font-weight:700;color:#ef4444;margin-top:4px;">\u09F3 ' + bDue.toLocaleString() + '</div></div><div style="flex:1;min-width:120px;padding:12px;background:rgba(239,68,68,0.06);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--text-secondary)">Total Due</div><div style="font-size:18px;font-weight:700;color:#ef4444;margin-top:4px;">\u09F3 ' + (sDue + bDue).toLocaleString() + '</div></div></div>';
+                    dh += '<h4 style="margin:0 0 8px;font-size:13px;">Sales Invoices with Due (' + dueInvs.length + ')</h4>';
+                    if (dueInvs.length === 0) { dh += '<p style="color:var(--text-secondary);font-size:12px;margin-bottom:12px;">No due invoices.</p>'; } else {
+                        dh += '<table class="admin-table" style="font-size:11px;"><thead><tr><th>Invoice</th><th>Customer</th><th style="text-align:right;">Due</th></tr></thead><tbody>';
+                        for (var di = 0; di < dueInvs.length; di++) { dh += '<tr><td>' + dueInvs[di].invoiceNo + '</td><td>' + dueInvs[di].customerName + '</td><td style="text-align:right;font-weight:600;color:#ef4444">\u09F3 ' + dueInvs[di].due.toLocaleString() + '</td></tr>'; }
+                        dh += '</tbody></table>';
+                    }
+                    dh += '<h4 style="margin:14px 0 8px;font-size:13px;">Manual Bookings with Due (' + dueBooks.length + ')</h4>';
+                    if (dueBooks.length === 0) { dh += '<p style="color:var(--text-secondary);font-size:12px;">No bookings with due amount.</p>'; } else {
+                        dh += '<table class="admin-table" style="font-size:11px;"><thead><tr><th>Slot</th><th>Customer</th><th style="text-align:right;">Due</th></tr></thead><tbody>';
+                        for (var db2 = 0; db2 < dueBooks.length; db2++) { dh += '<tr><td>' + (dueBooks[db2].slot || 'N/A') + '</td><td>' + (dueBooks[db2].customerName || 'N/A') + '</td><td style="text-align:right;font-weight:600;color:#ef4444">\u09F3 ' + dueBooks[db2].due.toLocaleString() + '</td></tr>'; }
+                        dh += '</tbody></table>';
+                    }
+                    dh += '</div>';
+                    return dh;
+                }
+                case 'pending-bookings': {
+                    var pond = dbTurfBookings.filter(function(b) { return b.status === 'pending'; });
+                    var pman = dbManualBookings.filter(function(b) { return b.status === 'pending'; });
+                    var phtml = '<div style="max-height:420px;overflow-y:auto;">';
+                    phtml += '<div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;"><div style="flex:1;min-width:120px;padding:12px;background:rgba(245,158,11,0.06);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--text-secondary)">Online Pending</div><div style="font-size:18px;font-weight:700;color:#f59e0b;margin-top:4px;">' + pond.length + '</div></div><div style="flex:1;min-width:120px;padding:12px;background:rgba(245,158,11,0.06);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--text-secondary)">Manual Pending</div><div style="font-size:18px;font-weight:700;color:#f59e0b;margin-top:4px;">' + pman.length + '</div></div><div style="flex:1;min-width:120px;padding:12px;background:rgba(245,158,11,0.06);border-radius:10px;text-align:center;"><div style="font-size:11px;color:var(--text-secondary)">Total Pending</div><div style="font-size:18px;font-weight:700;color:#f59e0b;margin-top:4px;">' + (pond.length + pman.length) + '</div></div></div>';
+                    phtml += '<h4 style="margin:0 0 8px;font-size:13px;">Online Pending Bookings (' + pond.length + ')</h4>';
+                    if (pond.length === 0) { phtml += '<p style="color:var(--text-secondary);font-size:12px;margin-bottom:12px;">No pending online bookings.</p>'; } else {
+                        phtml += '<table class="admin-table" style="font-size:11px;"><thead><tr><th>Slot</th><th>Customer</th><th>Date</th></tr></thead><tbody>';
+                        for (var po = 0; po < pond.length; po++) { phtml += '<tr><td>' + (pond[po].slot || 'N/A') + '</td><td>' + (pond[po].customerName || 'N/A') + '</td><td>' + (pond[po].date || 'N/A') + '</td></tr>'; }
+                        phtml += '</tbody></table>';
+                    }
+                    phtml += '<h4 style="margin:14px 0 8px;font-size:13px;">Manual Pending Bookings (' + pman.length + ')</h4>';
+                    if (pman.length === 0) { phtml += '<p style="color:var(--text-secondary);font-size:12px;">No pending manual bookings.</p>'; } else {
+                        phtml += '<table class="admin-table" style="font-size:11px;"><thead><tr><th>Slot</th><th>Customer</th><th>Date</th></tr></thead><tbody>';
+                        for (var pm = 0; pm < pman.length; pm++) { phtml += '<tr><td>' + (pman[pm].slot || 'N/A') + '</td><td>' + (pman[pm].customerName || 'N/A') + '</td><td>' + (pman[pm].date || 'N/A') + '</td></tr>'; }
+                        phtml += '</tbody></table>';
+                    }
+                    phtml += '</div>';
+                    return phtml;
+                }
+                default:
+                    return '<p style="color:var(--text-secondary);font-size:13px;">No data available for this category.</p>';
+            }
         }
 
         /* ==========================================================================
-           8. MODULE: RESTAURANT POS SYSTEM
-           ========================================================================== */
+            8. MODULE: RESTAURANT POS SYSTEM
+            ========================================================================== */
         function initPosWorkspace() {
             initPosCategoriesRow();
             renderPosCatalog();
@@ -6502,6 +6829,16 @@ table.admin-table tbody tr:hover td {
                     }
                 });
             }
+
+            document.querySelectorAll('.stat-card').forEach(function(card) {
+                card.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        var ct = this.getAttribute('data-card');
+                        if (ct) openDashboardDetail(ct);
+                    }
+                });
+            });
         });
     </script>
 </body>
