@@ -2405,25 +2405,88 @@ table.admin-table tbody tr:hover td {
                         </div>
                     </div>
 
-                    <div class="panel-card">
-                        <div class="panel-header">
-                            <h2>Operational Online Turf Reservations</h2>
+                    <div class="settings-split-grid" style="margin-bottom: 25px;">
+                        <div class="panel-card">
+                            <div class="panel-header">
+                                <h2>Quick Manual Booking</h2>
+                            </div>
+                            <form id="quickTurfBookingForm" onsubmit="saveQuickTurfBooking(event)">
+                                <div class="settings-split-grid" style="gap:10px">
+                                    <div class="input-group">
+                                        <label>Date</label>
+                                        <input type="date" id="qtbDate" class="form-control" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Slot / Time</label>
+                                        <select id="qtbSlot" class="form-control" required></select>
+                                    </div>
+                                </div>
+                                <div class="settings-split-grid" style="gap:10px">
+                                    <div class="input-group">
+                                        <label>Customer Name</label>
+                                        <input type="text" id="qtbName" class="form-control" required placeholder="Lead player name">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Mobile Number (Optional)</label>
+                                        <input type="tel" id="qtbPhone" class="form-control" placeholder="01XXXXXXXXX">
+                                    </div>
+                                </div>
+                                <div class="settings-split-grid" style="gap:10px">
+                                    <div class="input-group">
+                                        <label>Address (Optional)</label>
+                                        <input type="text" id="qtbAddress" class="form-control" placeholder="Customer address">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Amount (৳ BDT)</label>
+                                        <input type="number" id="qtbAmount" class="form-control" required min="0" value="" oninput="calcQuickTurfTotal()">
+                                    </div>
+                                </div>
+                                <div class="settings-split-grid" style="gap:10px">
+                                    <div class="input-group">
+                                        <label>Cash Received (৳)</label>
+                                        <input type="number" id="qtbPaid" class="form-control" required min="0" value="0" oninput="calcQuickTurfTotal()">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Discount (৳)</label>
+                                        <input type="number" id="qtbDiscount" class="form-control" value="0" min="0" oninput="calcQuickTurfTotal()">
+                                    </div>
+                                </div>
+                                <div style="background:rgba(255,255,255,0.02); padding:10px; border-radius:8px; border:1px solid var(--glass-border); margin-bottom:12px;">
+                                    <div class="calc-row"><span>Total:</span><span id="qtbCalcTotal" style="color:var(--primary-accent); font-weight:700;">৳ 0</span></div>
+                                    <div class="calc-row" style="margin-top:4px;"><span>Due:</span><span id="qtbCalcDue" style="color:#ef4444; font-weight:700;">৳ 0</span></div>
+                                </div>
+                                <button type="submit" class="btn-action btn-small" style="width:auto">Save & Approve Booking</button>
+                            </form>
                         </div>
-                        <div class="data-table-wrapper">
-                            <table class="admin-table">
-                                <thead>
-                                    <tr>
-                                        <th>Reservation Code</th>
-                                        <th>Lead Player</th>
-                                        <th>WhatsApp Phone</th>
-                                        <th>Date</th>
-                                        <th>Selected Slot</th>
-                                        <th>Status Badge</th>
-                                        <th>Control Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="turfBookingsTableBody"></tbody>
-                            </table>
+
+                        <div class="panel-card" style="display:flex; flex-direction:column; justify-content:space-between">
+                            <div>
+                                <div class="panel-header" style="flex-wrap:wrap; gap:8px;">
+                                    <h2 style="margin-right:auto;">Turf Reservations</h2>
+                                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                                        <button class="pos-cat-tab active" id="turfFilterAll" onclick="filterTurfBookings('all')">All</button>
+                                        <button class="pos-cat-tab" id="turfFilterPending" onclick="filterTurfBookings('pending')">New Booking</button>
+                                        <button class="pos-cat-tab" id="turfFilterApproved" onclick="filterTurfBookings('approved')">Approved</button>
+                                        <button class="pos-cat-tab" id="turfFilterRejected" onclick="filterTurfBookings('rejected')">Rejected</button>
+                                    </div>
+                                </div>
+                                <div class="table-responsive" style="max-height: calc(100vh - 350px); overflow-y:auto">
+                                    <table class="admin-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Code</th>
+                                                <th>Player</th>
+                                                <th>Phone</th>
+                                                <th>Date</th>
+                                                <th>Slot</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="turfBookingsTableBody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -3148,6 +3211,7 @@ table.admin-table tbody tr:hover td {
                 });
                 try { loadTurfConfigPage(); } catch(e) {}
                 try { loadDashboardAnalytics(); } catch(e) {}
+                try { loadDueManagement(); } catch(e) {}
             }, err => { console.warn("Firestore turf bookings listen error blocked:", err.message); });
             activeListeners.push(unsub7);
 
@@ -5242,6 +5306,17 @@ table.admin-table tbody tr:hover td {
                 });
             });
 
+            dbTurfBookings.filter(b => b.status === "approved" && b.due > 0).forEach(book => {
+                duesList.push({
+                    source: "Turf Online Booking",
+                    id: book.id,
+                    client: book.name,
+                    phone: book.phone,
+                    total: book.total,
+                    due: book.due
+                });
+            });
+
             const filteredDues = duesList.filter(d => {
                 return d.client.toLowerCase().includes(searchQuery) ||
                        d.phone.toLowerCase().includes(searchQuery) ||
@@ -5277,6 +5352,12 @@ table.admin-table tbody tr:hover td {
                 const target = dbSales.find(s => s.invoiceNo === id);
                 if (target) {
                     debtorName = target.customerName;
+                    remainingDebt = target.due;
+                }
+            } else if (source === "Turf Online Booking") {
+                const target = dbTurfBookings.find(b => b.id === id);
+                if (target) {
+                    debtorName = target.name;
                     remainingDebt = target.due;
                 }
             } else {
@@ -5334,6 +5415,32 @@ table.admin-table tbody tr:hover td {
                         closeModalAlert();
                         logSystemActivity(`Collected due amount ৳ ${collectionCash} for invoice ${id}`);
                         renderDueThermalReceipt(id, target.customerName, collectionCash, newPaid, newDue);
+                    }).catch(() => {
+                        showGlobalLoader(false);
+                        triggerToast("error", "Failed to register due cash.");
+                    });
+                }
+            } else if (source === "Turf Online Booking") {
+                const target = dbTurfBookings.find(b => b.id === id);
+                if (target) {
+                    const newPaid = target.paid + collectionCash;
+                    const newDue = target.due - collectionCash;
+                    db.collection("turf_bookings").doc(id).update({
+                        paid: newPaid,
+                        due: newDue
+                    }).then(() => {
+                        const incId = "inc-" + Math.floor(Math.random() * 100000);
+                        db.collection("ledger_incomes").doc(incId).set({
+                            source: "Turf Booking",
+                            amount: collectionCash,
+                            date: new Date().toISOString().slice(0,10),
+                            description: `Collected due portion for turf booking ${id}`
+                        });
+
+                        showGlobalLoader(false);
+                        closeModalAlert();
+                        logSystemActivity(`Collected due amount ৳ ${collectionCash} for turf booking ${id}`);
+                        renderDueThermalReceipt(id, target.name, collectionCash, newPaid, newDue);
                     }).catch(() => {
                         showGlobalLoader(false);
                         triggerToast("error", "Failed to register due cash.");
@@ -6172,6 +6279,17 @@ table.admin-table tbody tr:hover td {
         /* ==========================================================================
            16. TURF BOOKINGS MGMT
            ========================================================================== */
+        let turfBookingFilter = "all";
+
+        function filterTurfBookings(status) {
+            turfBookingFilter = status;
+            document.querySelectorAll('#tab-turf .pos-cat-tab').forEach(b => b.classList.remove('active'));
+            const btnId = status === 'all' ? 'turfFilterAll' : status === 'pending' ? 'turfFilterPending' : status === 'approved' ? 'turfFilterApproved' : 'turfFilterRejected';
+            const btn = document.getElementById(btnId);
+            if (btn) btn.classList.add('active');
+            loadTurfConfigPage();
+        }
+
         function loadTurfConfigPage() {
             const turfPricingNode = document.getElementById("turfPricing");
             if(!turfPricingNode) return;
@@ -6179,22 +6297,47 @@ table.admin-table tbody tr:hover td {
             turfPricingNode.value = dbTurfSet.rentPrice || 1500;
             document.getElementById("turfSlotsRange").value = dbTurfSet.slots || "";
 
+            const slotSelect = document.getElementById("qtbSlot");
+            if (slotSelect && slotSelect.options.length <= 1) {
+                const slots = (dbTurfSet.slots || "").split(",").map(s => s.trim()).filter(s => s);
+                slotSelect.innerHTML = `<option value="">Select Slot</option>`;
+                slots.forEach(s => {
+                    slotSelect.innerHTML += `<option value="${s}">${s}</option>`;
+                });
+            }
+
+            const dateInput = document.getElementById("qtbDate");
+            if (dateInput && !dateInput.value) {
+                dateInput.value = new Date().toISOString().slice(0, 10);
+            }
+
             const tbody = document.getElementById("turfBookingsTableBody");
             tbody.innerHTML = "";
 
-            dbTurfBookings.forEach(book => {
+            const filtered = turfBookingFilter === "all"
+                ? dbTurfBookings
+                : dbTurfBookings.filter(b => b.status === turfBookingFilter);
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-secondary)">No bookings found.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(book => {
                 const tr = document.createElement("tr");
                 const badgeClass = `badge-${book.status}`;
                 tr.innerHTML = `
                     <td style="font-weight:700">${book.id}</td>
                     <td style="font-weight:600">${book.name}</td>
-                    <td>${book.phone}</td>
+                    <td>${book.phone || '-'}</td>
                     <td>${book.date}</td>
                     <td>${book.slot}</td>
                     <td><span class="badge ${badgeClass}">${book.status}</span></td>
                     <td>
-                        <button class="btn-approve btn-small" onclick="updateTurfStatus('${book.id}', 'approved')">Approve</button>
-                        <button class="btn-reject btn-small" onclick="updateTurfStatus('${book.id}', 'rejected')">Reject</button>
+                        ${book.status === 'pending' ? `
+                            <button class="btn-approve btn-small" onclick="updateTurfStatus('${book.id}', 'approved')">Approve</button>
+                            <button class="btn-reject btn-small" onclick="updateTurfStatus('${book.id}', 'rejected')">Reject</button>
+                        ` : ''}
                         <button class="btn-delete btn-small" onclick="deleteTurfBooking('${book.id}')">Delete</button>
                     </td>
                 `;
@@ -6353,6 +6496,69 @@ table.admin-table tbody tr:hover td {
                     triggerToast("error", "Failed to delete booking.");
                 });
             }
+        }
+
+        function calcQuickTurfTotal() {
+            const amount = parseFloat(document.getElementById("qtbAmount").value) || 0;
+            const discount = parseFloat(document.getElementById("qtbDiscount").value) || 0;
+            const paid = parseFloat(document.getElementById("qtbPaid").value) || 0;
+            const total = Math.max(0, amount - discount);
+            const due = Math.max(0, total - paid);
+            document.getElementById("qtbCalcTotal").innerText = `৳ ${total.toLocaleString()}`;
+            document.getElementById("qtbCalcDue").innerText = `৳ ${due.toLocaleString()}`;
+        }
+
+        function saveQuickTurfBooking(e) {
+            e.preventDefault();
+            const date = document.getElementById("qtbDate").value;
+            const slot = document.getElementById("qtbSlot").value;
+            const name = document.getElementById("qtbName").value.trim();
+            const phone = document.getElementById("qtbPhone").value.trim();
+            const address = document.getElementById("qtbAddress").value.trim();
+            const amount = parseFloat(document.getElementById("qtbAmount").value) || 0;
+            const paid = parseFloat(document.getElementById("qtbPaid").value) || 0;
+            const discount = parseFloat(document.getElementById("qtbDiscount").value) || 0;
+            const total = Math.max(0, amount - discount);
+            const due = Math.max(0, total - paid);
+            const bookingCode = "KF-" + Math.floor(100000 + Math.random() * 900000);
+
+            showGlobalLoader(true);
+
+            db.collection("turf_bookings").doc(bookingCode).set({
+                bookingCode,
+                name,
+                phone: phone || "",
+                address: address || "",
+                email: "",
+                date,
+                slot,
+                status: "approved",
+                source: "manual",
+                price: amount,
+                discount,
+                paid,
+                due,
+                total,
+                createdAt: new Date().toISOString()
+            }).then(() => {
+                if (paid > 0) {
+                    db.collection("ledger_incomes").doc(bookingCode).set({
+                        source: "Turf Booking",
+                        amount: paid,
+                        date: new Date().toISOString().slice(0, 10),
+                        description: `Manual turf booking ${bookingCode} - ${name}`
+                    });
+                }
+                showGlobalLoader(false);
+                document.getElementById("quickTurfBookingForm").reset();
+                calcQuickTurfTotal();
+                triggerToast("success", `Booking ${bookingCode} created & approved.`);
+                logSystemActivity(`Quick manual turf booking created: ${bookingCode} for ${name}`);
+            }).catch(err => {
+                showGlobalLoader(false);
+                triggerToast("error", "Failed to create booking.");
+                console.error(err);
+            });
         }
 
         /* ==========================================================================
