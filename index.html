@@ -1326,6 +1326,10 @@ table.admin-table tbody tr:hover td {
                     <svg style="width:16px;height:16px;fill:currentColor;margin-right:8px" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 9h-2v2H9v-2H7V9h2V7h2v2h2v2zm-3-4V3.5L14.5 8H10z"/></svg>
                     Invoice Settings
                 </a>
+                <a href="#" class="menu-item" data-tab="ai-settings">
+                    <svg style="width:16px;height:16px;fill:currentColor;margin-right:8px" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+                    AI Settings
+                </a>
             </nav>
         </aside>
 
@@ -1373,6 +1377,16 @@ table.admin-table tbody tr:hover td {
                                <h3>Today's Bookings</h3>
                                <p id="stat-today-bookings">0</p>
                                <span class="trend-indicator up">↑ 4 slots reserved</span>
+                            </div>
+                            <div class="stat-icon-wrapper ring-emerald">
+                                <div class="stat-icon">&#9917;</div>
+                            </div>
+                        </div>
+                        <div class="stat-card" tabindex="0" role="button" data-card="today-turf" onmouseenter="showDashTooltip(event,'today-turf')" onmouseleave="hideDashTooltip()" onclick="openDashboardDetail('today-turf')">
+                            <div class="stat-info">
+                               <h3>Today's Turf Bookings</h3>
+                               <p id="stat-today-turf">0</p>
+                               <span class="trend-indicator up" id="stat-today-turf-trend">↑ 0 slots today</span>
                             </div>
                             <div class="stat-icon-wrapper ring-emerald">
                                 <div class="stat-icon">&#9917;</div>
@@ -1950,6 +1964,66 @@ table.admin-table tbody tr:hover td {
                                     <!-- Dynamic elements from DB loaded here -->
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+
+                    <!-- Production Notes + AI Analysis Section -->
+                    <div class="settings-split-grid" style="margin-top:25px; gap:16px;">
+                        <!-- Left: Notes Editor -->
+                        <div class="panel-card">
+                            <div class="panel-header">
+                                <h2>Production Notes (নোটস)</h2>
+                                <p style="font-size:11px; color:var(--text-secondary); margin-top:2px;">কাঁচামাল, খরচ, সমস্যা, পরিকল্পনা - যেকোনো কিছু লিখুন। AI বিশ্লেষণ করবে।</p>
+                            </div>
+                            <div class="input-group">
+                                <label>Note Title</label>
+                                <input type="text" id="prodNoteTitle" class="form-control" placeholder="যেমন: সিরা ব্যাচ #45 বিশ্লেষণ">
+                            </div>
+                            <div class="input-group" style="margin-top:8px;">
+                                <label>Category</label>
+                                <select id="prodNoteCategory" class="form-control">
+                                    <option value="raw_material">Raw Material / কাঁচামাল</option>
+                                    <option value="cost_analysis">Cost Analysis / খরচ বিশ্লেষণ</option>
+                                    <option value="quality">Quality / মান নিয়ন্ত্রণ</option>
+                                    <option value="waste">Waste / অপচয়</option>
+                                    <option value="planning">Planning / পরিকল্পনা</option>
+                                    <option value="general">General / সাধারণ</option>
+                                </select>
+                            </div>
+                            <div class="input-group" style="margin-top:8px;">
+                                <label>Notes Content</label>
+                                <textarea id="prodNoteContent" class="form-control" style="height:150px; min-height:120px; font-size:13px; line-height:1.6;" placeholder="আপনার নোট লিখুন...&#10;&#10;যেমন:&#10;- আজকে চিনির দাম ৳১২০/kg ছিল&#10;- মোট ৫০kg ব্যবহার করেছি&#10;- গত সপ্তাহের তুলনায় ১০% বেশি খরচ হয়েছে&#10;- বিক্রয় মূল্য বাড়ানো প্রয়োজন হতে পারে"></textarea>
+                            </div>
+                            <div style="display:flex; gap:10px; margin-top:12px;">
+                                <button type="button" class="btn-action btn-small" style="width:auto;" onclick="saveProductionNote()">Save Note</button>
+                                <button type="button" class="btn-secondary btn-small" style="width:auto;" onclick="analyzeProductionNote()">AI Analyze Note</button>
+                            </div>
+                            <div id="prodNoteStatus" style="margin-top:8px; font-size:12px; color:var(--text-secondary);"></div>
+                        </div>
+
+                        <!-- Right: AI Analysis Result -->
+                        <div class="panel-card">
+                            <div class="panel-header">
+                                <h2>AI Analysis Result</h2>
+                                <p style="font-size:11px; color:var(--text-secondary); margin-top:2px;">AI নোট এবং ব্যাচ ডেটা বিশ্লেষণ করে সুপারিশ দেবে।</p>
+                            </div>
+                            <div id="aiAnalysisResult" style="background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:12px; padding:20px; min-height:300px;">
+                                <div style="text-align:center; padding:40px 20px;">
+                                    <svg style="width:48px; height:48px; fill:var(--text-secondary); opacity:0.3; margin-bottom:12px;" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+                                    <p style="font-size:13px; color:var(--text-secondary);">বাম পাশে নোট লিখে "AI Analyze Note" চাপুন।</p>
+                                    <p style="font-size:11px; color:var(--text-secondary); margin-top:6px;">AI স্বয়ংক্রিয়ভাবে সকল ব্যাচ ডেটা এবং আপনার নোট বিশ্লেষণ করবে।</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Saved Notes List -->
+                    <div class="panel-card" style="margin-top:25px;">
+                        <div class="panel-header">
+                            <h2>Saved Notes History</h2>
+                        </div>
+                        <div id="savedProductionNotesContainer">
+                            <p style="font-size:13px; color:var(--text-secondary); text-align:center; padding:20px;">এখনো কোনো নোট সেভ করা হয়নি।</p>
                         </div>
                     </div>
                 </div>
@@ -2858,6 +2932,79 @@ table.admin-table tbody tr:hover td {
                     </div>
                 </div>
 
+                <div class="tab-pane" id="tab-ai-settings">
+                    <div class="panel-card">
+                        <div class="panel-header">
+                            <h2>AI Settings Configuration</h2>
+                            <p style="font-size:12px; color:var(--text-secondary); margin-top:4px;">OpenRouter & Google AI Studio API কনফিগার করুন। Production Analysis এ ব্যবহার হবে।</p>
+                        </div>
+                        <form id="aiSettingsForm" onsubmit="saveAISettings(event)">
+                            <div class="settings-split-grid">
+                                <div class="section-box">
+                                    <h4 style="font-size:13px; font-weight:700; margin-bottom:12px; color:var(--primary-accent);">OpenRouter API</h4>
+                                    <div class="input-group">
+                                        <label for="aiOpenRouterKey">API Key</label>
+                                        <input type="password" id="aiOpenRouterKey" class="form-control" placeholder="sk-or-v1-xxxx...">
+                                        <span style="font-size:10px; color:var(--text-secondary)">openrouter.ai থেকে পাবেন</span>
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="aiOpenRouterModel">Default Model</label>
+                                        <select id="aiOpenRouterModel" class="form-control">
+                                            <option value="google/gemini-3.5-flash">Google Gemini 3.5 Flash (Best)</option>
+                                            <option value="google/gemini-3.1-flash-lite">Google Gemini 3.1 Flash Lite (Cheapest)</option>
+                                            <option value="openai/gpt-4o">OpenAI GPT-4o</option>
+                                            <option value="openai/gpt-4o-mini">OpenAI GPT-4o Mini</option>
+                                            <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+                                            <option value="meta-llama/llama-4-maverick">Meta Llama 4 Maverick</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="section-box">
+                                    <h4 style="font-size:13px; font-weight:700; margin-bottom:12px; color:#4285f4;">Google AI Studio</h4>
+                                    <div class="input-group">
+                                        <label for="aiGoogleKey">API Key</label>
+                                        <input type="password" id="aiGoogleKey" class="form-control" placeholder="AIzaSy...">
+                                        <span style="font-size:10px; color:var(--text-secondary)">aistudio.google.com থেকে পাবেন</span>
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="aiGoogleModel">Default Model</label>
+                                        <select id="aiGoogleModel" class="form-control">
+                                            <option value="gemini-3.5-flash">Gemini 3.5 Flash (Best)</option>
+                                            <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                                            <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash Lite (Cheapest)</option>
+                                            <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-group" style="margin-top:15px;">
+                                        <label>Active AI Provider</label>
+                                        <div style="display:flex; gap:10px; margin-top:6px;">
+                                            <label style="display:flex; align-items:center; gap:5px; font-size:12px; cursor:pointer;">
+                                                <input type="radio" name="aiProvider" value="openrouter" checked> OpenRouter
+                                            </label>
+                                            <label style="display:flex; align-items:center; gap:5px; font-size:12px; cursor:pointer;">
+                                                <input type="radio" name="aiProvider" value="google"> Google AI Studio
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-row-btns" style="margin-top:15px;">
+                                <button type="submit" class="btn-action btn-small" style="width:auto;">Save AI Settings</button>
+                                <button type="button" class="btn-secondary btn-small" onclick="testAIConnection()" style="width:auto;">Test Connection</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="panel-card" style="margin-top:20px;">
+                        <div class="panel-header">
+                            <h2>AI Analysis History</h2>
+                        </div>
+                        <div id="aiAnalysisHistoryContainer">
+                            <p style="font-size:13px; color:var(--text-secondary); text-align:center; padding:20px;">কোনো analysis এখনো করা হয়নি। Production Costing Tab থেকে নোট লিখে AI Analyze করুন।</p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
@@ -3132,6 +3279,8 @@ table.admin-table tbody tr:hover td {
         let dbInvoiceSettings = {};
         let dbExpenseCategories = [];
         let dbProductionBatches = [];
+        let dbAISettings = {};
+        let dbAIAnalyses = [];
         let lastQuickSale = null; 
 
         let posCart = [];
@@ -3353,6 +3502,20 @@ table.admin-table tbody tr:hover td {
                 try { loadProductionCostingTab(); } catch(e) {}
             }, err => { console.warn("Firestore production batches listen error blocked:", err.message); });
             activeListeners.push(unsub21);
+
+            const unsub22 = db.collection("settings").doc("ai_config").onSnapshot(doc => {
+                dbAISettings = doc.exists ? doc.data() : {};
+            }, err => { console.warn("Firestore AI settings listen error blocked:", err.message); });
+            activeListeners.push(unsub22);
+
+            const unsub23 = db.collection("ai_analyses").orderBy("createdAt", "desc").limit(50).onSnapshot(snapshot => {
+                dbAIAnalyses = [];
+                snapshot.forEach(doc => {
+                    dbAIAnalyses.push({ id: doc.id, ...doc.data() });
+                });
+                try { renderAIAnalysisHistory(); } catch(e) {}
+            }, err => { console.warn("Firestore AI analyses listen error blocked:", err.message); });
+            activeListeners.push(unsub23);
         }
 
         /* ==========================================================================
@@ -3362,7 +3525,7 @@ table.admin-table tbody tr:hover td {
             'dashboard', 'pos', 'quicksale', 'sales', 'reports', 'manual-booking', 'production-costing',
             'dues', 'accounting', 'expenses', 'settings', 'homepage', 'restaurant', 
             'turf', 'events', 'gallery', 'contact', 'theme', 'users', 'approvals',
-            'security', 'backup', 'invoice-settings'
+            'security', 'backup', 'invoice-settings', 'ai-settings'
         ];
 
         function navigateToTab(tabId) {
@@ -3410,7 +3573,8 @@ table.admin-table tbody tr:hover td {
                 approvals: "⚡ Staff Approval Requests Desk",
                 security: "Security Password settings",
                 backup: "Database Backup utility (JSON)",
-                "invoice-settings": "Invoice & Receipt Settings Panel"
+                "invoice-settings": "Invoice & Receipt Settings Panel",
+                "ai-settings": "AI Configuration & Analysis Portal"
             };
             
             const tabTitleHeader = document.getElementById("tabTitleHeader");
@@ -3445,6 +3609,7 @@ table.admin-table tbody tr:hover td {
             }
             if (tabId === "production-costing") {
                 try { clearProductionForm(); loadProductionCostingTab(); } catch (e) { console.warn("Failed to load Production Costing: ", e); }
+                try { loadProductionNotes(); } catch (e) {}
             }
             if (tabId === "dues") {
                 try { loadDueManagement(); } catch (e) { console.warn("Due management failed to load: ", e); }
@@ -3490,6 +3655,9 @@ table.admin-table tbody tr:hover td {
             if (tabId === "invoice-settings") {
                 try { populateInvoiceSettingsTab(); } catch (e) { console.warn("Invoice settings failed to populate: ", e); }
             }
+            if (tabId === "ai-settings") {
+                try { loadAISettingsTab(); } catch (e) { console.warn("AI settings failed to load: ", e); }
+            }
         }
 
         /* ==========================================================================
@@ -3510,6 +3678,22 @@ table.admin-table tbody tr:hover td {
             const todayOnlineCount = dbTurfBookings.filter(b => b.date === todayStr).length;
             const todayManualCount = dbManualBookings.filter(b => b.date === todayStr).length;
             document.getElementById("stat-today-bookings").innerText = todayOnlineCount + todayManualCount;
+
+            const todayTurfBookings = dbTurfBookings.filter(b => b.date === todayStr);
+            const todayTurfCount = todayTurfBookings.length;
+            const todayTurfApproved = todayTurfBookings.filter(b => b.status === "approved").length;
+            const todayTurfPending = todayTurfBookings.filter(b => b.status === "pending").length;
+            document.getElementById("stat-today-turf").innerText = todayTurfCount;
+            const turfTrendEl = document.getElementById("stat-today-turf-trend");
+            if (turfTrendEl) {
+                if (todayTurfCount > 0) {
+                    turfTrendEl.className = 'trend-indicator up';
+                    turfTrendEl.innerText = `↑ ${todayTurfApproved} approved, ${todayTurfPending} pending`;
+                } else {
+                    turfTrendEl.className = 'trend-indicator neutral';
+                    turfTrendEl.innerText = '→ No turf bookings today';
+                }
+            }
 
             const currentMonthPrefix = new Date().toISOString().slice(0, 7);
             const monthlyInvoices = dbSales.filter(s => s.dateTime.startsWith(currentMonthPrefix));
@@ -3637,6 +3821,15 @@ table.admin-table tbody tr:hover td {
                     growthColor: bookingsGrowthColor,
                     updated: nowTime
                 },
+                'today-turf': {
+                    title: "Today's Turf Bookings",
+                    desc: 'All turf slot reservations (online + manual) for today',
+                    current: String(todayTurfCount),
+                    previous: String(dbTurfBookings.filter(b => b.date === yesterdayDate).length),
+                    growth: todayTurfCount >= dbTurfBookings.filter(b => b.date === yesterdayDate).length ? '↑ +' + (todayTurfCount - dbTurfBookings.filter(b => b.date === yesterdayDate).length) : '↓ -' + (dbTurfBookings.filter(b => b.date === yesterdayDate).length - todayTurfCount),
+                    growthColor: todayTurfCount >= dbTurfBookings.filter(b => b.date === yesterdayDate).length ? '#10B981' : '#ef4444',
+                    updated: nowTime
+                },
                 'monthly-sales': {
                     title: 'Monthly Sales Revenue',
                     desc: 'Total sales from invoices & quick sales this month',
@@ -3757,7 +3950,7 @@ table.admin-table tbody tr:hover td {
                     h += '<h4 style="margin:0 0 8px;font-size:13px;">Online Turf Bookings (' + online.length + ')</h4>';
                     if (online.length === 0) { h += '<p style="color:var(--text-secondary);font-size:12px;margin-bottom:12px;">No online bookings today.</p>'; } else {
                         h += '<table class="admin-table" style="font-size:11px;"><thead><tr><th>Slot</th><th>Customer</th><th>Status</th></tr></thead><tbody>';
-                        for (var k = 0; k < online.length; k++) { h += '<tr><td>' + (online[k].slot || 'N/A') + '</td><td>' + (online[k].customerName || 'N/A') + '</td><td>' + (online[k].status || 'N/A') + '</td></tr>'; }
+                        for (var k = 0; k < online.length; k++) { h += '<tr><td>' + (online[k].slot || 'N/A') + '</td><td>' + (online[k].name || online[k].customerName || 'N/A') + '</td><td>' + (online[k].status || 'N/A') + '</td></tr>'; }
                         h += '</tbody></table>';
                     }
                     h += '<h4 style="margin:14px 0 8px;font-size:13px;">Manual Bookings (' + manual.length + ')</h4>';
@@ -3768,6 +3961,45 @@ table.admin-table tbody tr:hover td {
                     }
                     h += '</div>';
                     return h;
+                }
+                case 'today-turf': {
+                    var turfToday = dbTurfBookings.filter(function(b) { return b.date === todayStr; });
+                    var turfApproved = turfToday.filter(function(b) { return b.status === 'approved'; });
+                    var turfPending = turfToday.filter(function(b) { return b.status === 'pending'; });
+                    var turfRejected = turfToday.filter(function(b) { return b.status === 'rejected'; });
+                    var turfTotalPaid = turfToday.reduce(function(s, b) { return s + (b.paid || 0); }, 0);
+                    var turfTotalDue = turfToday.reduce(function(s, b) { return s + (b.due || 0); }, 0);
+                    var t = '<div style="max-height:420px;overflow-y:auto;">';
+                    t += '<div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">';
+                    t += '<div style="flex:1;min-width:100px;padding:10px;background:rgba(16,185,129,0.06);border-radius:10px;text-align:center;"><div style="font-size:10px;color:var(--text-secondary)">Total</div><div style="font-size:20px;font-weight:700;color:var(--primary-accent);margin-top:4px;">' + turfToday.length + '</div></div>';
+                    t += '<div style="flex:1;min-width:100px;padding:10px;background:rgba(16,185,129,0.06);border-radius:10px;text-align:center;"><div style="font-size:10px;color:var(--text-secondary)">Approved</div><div style="font-size:20px;font-weight:700;color:#10B981;margin-top:4px;">' + turfApproved.length + '</div></div>';
+                    t += '<div style="flex:1;min-width:100px;padding:10px;background:rgba(245,158,11,0.06);border-radius:10px;text-align:center;"><div style="font-size:10px;color:var(--text-secondary)">Pending</div><div style="font-size:20px;font-weight:700;color:#f59e0b;margin-top:4px;">' + turfPending.length + '</div></div>';
+                    t += '<div style="flex:1;min-width:100px;padding:10px;background:rgba(239,68,68,0.06);border-radius:10px;text-align:center;"><div style="font-size:10px;color:var(--text-secondary)">Rejected</div><div style="font-size:20px;font-weight:700;color:#ef4444;margin-top:4px;">' + turfRejected.length + '</div></div>';
+                    t += '</div>';
+                    t += '<div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">';
+                    t += '<div style="flex:1;min-width:120px;padding:10px;background:rgba(16,185,129,0.04);border:1px solid rgba(16,185,129,0.15);border-radius:10px;text-align:center;"><div style="font-size:10px;color:var(--text-secondary)">Total Collected</div><div style="font-size:16px;font-weight:700;color:#10B981;margin-top:4px;">\u09F3 ' + turfTotalPaid.toLocaleString() + '</div></div>';
+                    t += '<div style="flex:1;min-width:120px;padding:10px;background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.15);border-radius:10px;text-align:center;"><div style="font-size:10px;color:var(--text-secondary)">Total Due</div><div style="font-size:16px;font-weight:700;color:#ef4444;margin-top:4px;">\u09F3 ' + turfTotalDue.toLocaleString() + '</div></div>';
+                    t += '</div>';
+                    if (turfToday.length === 0) {
+                        t += '<div style="text-align:center;padding:30px;color:var(--text-secondary);font-size:13px;">No turf bookings today.</div>';
+                    } else {
+                        t += '<table class="admin-table" style="font-size:11px;"><thead><tr><th>Name</th><th>Phone</th><th>Slot</th><th>Source</th><th>Status</th><th>Amount</th></tr></thead><tbody>';
+                        for (var ti = 0; ti < turfToday.length; ti++) {
+                            var b = turfToday[ti];
+                            var statusColor = b.status === 'approved' ? '#10B981' : b.status === 'pending' ? '#f59e0b' : '#ef4444';
+                            t += '<tr>';
+                            t += '<td style="font-weight:600">' + (b.name || 'N/A') + '</td>';
+                            t += '<td>' + (b.phone || '-') + '</td>';
+                            t += '<td>' + (b.slot || 'N/A') + '</td>';
+                            t += '<td><span style="font-size:10px;padding:2px 6px;border-radius:10px;background:rgba(255,255,255,0.05);color:var(--text-secondary)">' + (b.source || 'online') + '</span></td>';
+                            t += '<td><span style="font-size:10px;padding:2px 6px;border-radius:10px;background:rgba(' + (b.status === 'approved' ? '16,185,129' : b.status === 'pending' ? '245,158,11' : '239,68,68') + ',0.15);color:' + statusColor + '">' + (b.status || 'N/A') + '</span></td>';
+                            t += '<td style="font-weight:600;color:var(--primary-accent)">\u09F3 ' + (b.total || 0).toLocaleString() + '</td>';
+                            t += '</tr>';
+                        }
+                        t += '</tbody></table>';
+                    }
+                    t += '</div>';
+                    return t;
                 }
                 case 'monthly-sales': {
                     var minv = dbSales.filter(function(s) { return s.dateTime.startsWith(monthPrefix); });
@@ -7034,7 +7266,9 @@ table.admin-table tbody tr:hover td {
                 accounting: dbAccounting,
                 quick_sales: dbQuickSales,
                 invoice_settings: dbInvoiceSettings,
-                production_batches: dbProductionBatches
+                production_batches: dbProductionBatches,
+                ai_settings: dbAISettings,
+                ai_analyses: dbAIAnalyses
             };
 
             const textOutput = JSON.stringify(databasePack, null, 2);
@@ -7093,6 +7327,13 @@ table.admin-table tbody tr:hover td {
 
                             dbProductionBatches.forEach(pb => promises.push(db.collection("production_batches").doc(pb.id).delete()));
                             (parsed.production_batches || []).forEach(pb => promises.push(db.collection("production_batches").doc(pb.id).set(pb)));
+
+                            dbAIAnalyses.forEach(a => promises.push(db.collection("ai_analyses").doc(a.id).delete()));
+                            (parsed.ai_analyses || []).forEach(a => promises.push(db.collection("ai_analyses").doc(a.id).set(a)));
+
+                            if (parsed.ai_settings && Object.keys(parsed.ai_settings).length > 0) {
+                                promises.push(db.collection("settings").doc("ai_config").set(parsed.ai_settings));
+                            }
 
                             Promise.all(promises).then(() => {
                                 showGlobalLoader(false);
@@ -7666,6 +7907,320 @@ table.admin-table tbody tr:hover td {
                 });
             });
         });
+
+        /* ==========================================================================
+           AI SETTINGS & PRODUCTION ANALYSIS MODULE
+           ========================================================================== */
+
+        function loadAISettingsTab() {
+            const keyInput = document.getElementById("aiOpenRouterKey");
+            const modelSelect = document.getElementById("aiOpenRouterModel");
+            const googleKeyInput = document.getElementById("aiGoogleKey");
+            const googleModelSelect = document.getElementById("aiGoogleModel");
+            
+            if (dbAISettings.openRouterKey) keyInput.value = dbAISettings.openRouterKey;
+            if (dbAISettings.openRouterModel) modelSelect.value = dbAISettings.openRouterModel;
+            if (dbAISettings.googleKey) googleKeyInput.value = dbAISettings.googleKey;
+            if (dbAISettings.googleModel) googleModelSelect.value = dbAISettings.googleModel;
+            if (dbAISettings.provider) {
+                document.querySelectorAll('input[name="aiProvider"]').forEach(r => {
+                    r.checked = r.value === dbAISettings.provider;
+                });
+            }
+            renderAIAnalysisHistory();
+        }
+
+        function saveAISettings(e) {
+            e.preventDefault();
+            const provider = document.querySelector('input[name="aiProvider"]:checked')?.value || "openrouter";
+            const data = {
+                openRouterKey: document.getElementById("aiOpenRouterKey").value.trim(),
+                openRouterModel: document.getElementById("aiOpenRouterModel").value,
+                googleKey: document.getElementById("aiGoogleKey").value.trim(),
+                googleModel: document.getElementById("aiGoogleModel").value,
+                provider: provider,
+                updatedAt: new Date().toISOString()
+            };
+            db.collection("settings").doc("ai_config").set(data, { merge: true }).then(() => {
+                triggerToast("success", "AI Settings saved successfully.");
+            }).catch(err => {
+                triggerToast("error", "Failed to save AI settings: " + err.message);
+            });
+        }
+
+        function testAIConnection() {
+            const provider = document.querySelector('input[name="aiProvider"]:checked')?.value || "openrouter";
+            let apiKey, model, url, headers;
+            if (provider === "openrouter") {
+                apiKey = document.getElementById("aiOpenRouterKey").value.trim();
+                model = document.getElementById("aiOpenRouterModel").value;
+                if (!apiKey) { triggerToast("warning", "OpenRouter API Key দিন।"); return; }
+                url = "https://openrouter.ai/api/v1/chat/completions";
+                headers = { "Authorization": "Bearer " + apiKey, "Content-Type": "application/json", "HTTP-Referer": window.location.origin };
+            } else {
+                apiKey = document.getElementById("aiGoogleKey").value.trim();
+                model = document.getElementById("aiGoogleModel").value;
+                if (!apiKey) { triggerToast("warning", "Google AI API Key দিন।"); return; }
+                url = "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent";
+                headers = { "Content-Type": "application/json", "x-goog-api-key": apiKey };
+            }
+
+            triggerToast("info", "Testing AI connection...");
+            let body;
+            if (provider === "openrouter") {
+                body = JSON.stringify({ model: model, messages: [{ role: "user", content: "বাংলায় লিখো: সংযোগ সফল" }], max_tokens: 20 });
+            } else {
+                body = JSON.stringify({ contents: [{ parts: [{ text: "বাংলায় লিখো: সংযোগ সফল" }] }] });
+            }
+
+            fetch(url, { method: "POST", headers: headers, body: body }).then(r => {
+                if (!r.ok) throw new Error("HTTP " + r.status);
+                return r.json();
+            }).then(data => {
+                const reply = provider === "openrouter"
+                    ? (data.choices?.[0]?.message?.content || "")
+                    : (data.candidates?.[0]?.content?.parts?.[0]?.text || "");
+                if (reply.includes("সংযোগ সফল") || reply.includes("CONNECTION") || reply.length > 0) {
+                    triggerToast("success", "AI Connection Successful! (" + provider.toUpperCase() + ")");
+                } else {
+                    triggerToast("warning", "Connection OK but unexpected response.");
+                }
+            }).catch(err => {
+                triggerToast("error", "AI Connection Failed: " + err.message);
+            });
+        }
+
+        let dbProductionNotes = [];
+
+        function loadProductionNotes() {
+            db.collection("production_notes").orderBy("createdAt", "desc").limit(30).get().then(snap => {
+                dbProductionNotes = [];
+                snap.forEach(doc => dbProductionNotes.push({ id: doc.id, ...doc.data() }));
+                renderSavedNotes();
+            });
+        }
+
+        function saveProductionNote() {
+            const title = document.getElementById("prodNoteTitle").value.trim();
+            const category = document.getElementById("prodNoteCategory").value;
+            const content = document.getElementById("prodNoteContent").value.trim();
+            if (!title || !content) {
+                triggerToast("warning", "Title এবং Content দুটোই দিতে হবে।");
+                return;
+            }
+            const noteData = {
+                title, category, content,
+                createdAt: new Date().toISOString(),
+                createdBy: (firebase.auth().currentUser || {}).email || "unknown"
+            };
+            db.collection("production_notes").add(noteData).then(() => {
+                document.getElementById("prodNoteTitle").value = "";
+                document.getElementById("prodNoteContent").value = "";
+                document.getElementById("prodNoteStatus").innerHTML = '<span style="color:var(--primary-accent)">Note saved successfully.</span>';
+                triggerToast("success", "Note saved.");
+                loadProductionNotes();
+            }).catch(err => {
+                triggerToast("error", "Failed to save note: " + err.message);
+            });
+        }
+
+        function renderSavedNotes() {
+            const container = document.getElementById("savedProductionNotesContainer");
+            if (!container) return;
+            if (dbProductionNotes.length === 0) {
+                container.innerHTML = '<p style="font-size:13px; color:var(--text-secondary); text-align:center; padding:20px;">এখনো কোনো নোট সেভ করা হয়নি।</p>';
+                return;
+            }
+            const catLabels = { raw_material: "Raw Material", cost_analysis: "Cost Analysis", quality: "Quality", waste: "Waste", planning: "Planning", general: "General" };
+            let html = '<div style="display:flex; flex-direction:column; gap:10px;">';
+            dbProductionNotes.forEach(n => {
+                html += `
+                    <div style="background:rgba(255,255,255,0.03); border:1px solid var(--glass-border); border-radius:10px; padding:12px 15px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <span style="font-weight:700; font-size:13px; color:var(--text-primary);">${n.title}</span>
+                            <span style="font-size:10px; background:rgba(46,189,89,0.15); color:var(--primary-accent); padding:2px 8px; border-radius:10px;">${catLabels[n.category] || n.category}</span>
+                        </div>
+                        <p style="font-size:12px; color:var(--text-secondary); line-height:1.5; white-space:pre-wrap; margin:0;">${n.content}</p>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                            <span style="font-size:10px; color:var(--text-secondary);">${new Date(n.createdAt).toLocaleString('bn-BD')}</span>
+                            <button class="btn-delete btn-small" style="padding:3px 8px; font-size:10px;" onclick="deleteProductionNote('${n.id}')">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function deleteProductionNote(noteId) {
+            if (!confirm("নোট ডিলিট করতে চান?")) return;
+            db.collection("production_notes").doc(noteId).delete().then(() => {
+                triggerToast("success", "Note deleted.");
+                loadProductionNotes();
+            });
+        }
+
+        function analyzeProductionNote() {
+            const title = document.getElementById("prodNoteTitle").value.trim();
+            const category = document.getElementById("prodNoteCategory").value;
+            const content = document.getElementById("prodNoteContent").value.trim();
+            if (!content) {
+                triggerToast("warning", "AI Analyze করার জন্য প্রথমে নোট লিখুন।");
+                return;
+            }
+            const provider = dbAISettings.provider || "openrouter";
+            let apiKey, model;
+            if (provider === "openrouter") {
+                apiKey = dbAISettings.openRouterKey;
+                model = dbAISettings.openRouterModel || "google/gemini-3.5-flash";
+            } else {
+                apiKey = dbAISettings.googleKey;
+                model = dbAISettings.googleModel || "gemini-3.5-flash";
+            }
+            if (!apiKey) {
+                triggerToast("warning", "AI Settings এ API Key সেট করুন। (AI Settings Tab)");
+                return;
+            }
+
+            const resultBox = document.getElementById("aiAnalysisResult");
+            resultBox.innerHTML = `
+                <div style="text-align:center; padding:40px;">
+                    <div style="width:32px; height:32px; border:3px solid var(--primary-accent); border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 12px;"></div>
+                    <p style="font-size:13px; color:var(--primary-accent); font-weight:600;">AI বিশ্লেষণ করছে...</p>
+                    <p style="font-size:11px; color:var(--text-secondary); margin-top:4px;">Production data + Notes processing</p>
+                </div>
+            `;
+
+            let batchSummary = "";
+            if (dbProductionBatches.length > 0) {
+                const recent = [...dbProductionBatches].sort((a, b) => (b.date || "").localeCompare(a.date || "")).slice(0, 10);
+                batchSummary = "\n\n--- Recent Production Batches (Last 10) ---\n";
+                recent.forEach((b, i) => {
+                    batchSummary += `Batch ${i+1}: ${b.itemName || 'N/A'} | Date: ${b.date} | Cost: ৳${b.totalCost} | Units: ${b.outputQty} ${b.outputUnit} | Cost/Unit: ৳${b.costPerUnit} | Sale: ৳${b.salePrice} | Profit: ৳${b.totalProfit} (${b.profitMargin}%)\n`;
+                    if (b.ingredients && b.ingredients.length > 0) {
+                        b.ingredients.forEach(ing => {
+                            batchSummary += `  - ${ing.name}: ${ing.qty} ${ing.unit} @ ৳${ing.price}\n`;
+                        });
+                    }
+                });
+            }
+
+            const prompt = `তুমি একজন প্রোডাকশন কস্ট অ্যানালিস্ট। তুমি Cafe/Restaurant ব্যবসার (Bangladesh, BDT মুদ্রা) জন্য কাজ করো। নিচের প্রোডাকশন নোট এবং ব্যাচ ডেটা বিশ্লেষণ করো। উত্তর সবসময় বাংলায় দাও।
+
+বিশ্লেষণ করো এবং দাও:
+
+1. **খরচ বিশ্লেষণ** - বর্তমান খরচের অবস্থা, প্রবণতা
+2. **মূল পর্যবেক্ষণ** - গুরুত্বপূর্ণ প্যাটার্ন বা সমস্যা
+3. **সুপারিশ** - কার্যকর পরামর্শ (সর্বোচ্চ ৫টি)
+4. **ঝুঁকি মূল্যায়ন** - সম্ভাব্য সমস্যা যার দিকে খেয়াল রাখতে হবে
+5. **লাভের উপর প্রভাব** - পর্যবেক্ষণগুলো লাভে কীভাবে প্রভাব ফেলবে
+
+গুরুত্বপূর্ণ: উত্তর বাংলায় দাও। HTML format এ দাও (<h4>, <p>, <ul><li>, <strong>, <em> ব্যবহার করো)। সংক্ষিপ্ত কিন্তু বিস্তারিত রাখো। BDT পরিমাণের জন্য ৳ ব্যবহার করো।
+
+--- ইউজারের নোট ---
+শিরোনাম: ${title || 'শিরোনামহীন'}
+ক্যাটাগরি: ${category}
+বিষয়বস্তু: ${content}
+${batchSummary}`;
+
+            const callOpenRouter = (apiKey, model) => {
+                return fetch("https://openrouter.ai/api/v1/chat/completions", {
+                    method: "POST",
+                    headers: { "Authorization": "Bearer " + apiKey, "Content-Type": "application/json", "HTTP-Referer": window.location.origin },
+                    body: JSON.stringify({ model: model, messages: [{ role: "user", content: prompt }], max_tokens: 2000, temperature: 0.7 })
+                }).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+                  .then(d => d.choices?.[0]?.message?.content || "No response");
+            };
+
+            const callGoogleAI = (apiKey, model) => {
+                return fetch("https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { maxOutputTokens: 2000, temperature: 0.7 } })
+                }).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+                  .then(d => d.candidates?.[0]?.content?.parts?.[0]?.text || "No response");
+            };
+
+            const apiCall = provider === "openrouter" ? callOpenRouter(apiKey, model) : callGoogleAI(apiKey, model);
+
+            apiCall.then(responseText => {
+                resultBox.innerHTML = `
+                    <div style="font-size:13px; line-height:1.7; color:var(--text-primary);">${responseText}</div>
+                    <div style="margin-top:16px; padding-top:12px; border-top:1px solid var(--glass-border); display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:10px; color:var(--text-secondary);">${new Date().toLocaleString()} | ${provider.toUpperCase()} | ${model}</span>
+                        <button class="btn-action btn-small" style="width:auto; padding:5px 12px; font-size:11px;" onclick="saveAIAnalysis('${category}')">Save Analysis</button>
+                    </div>
+                `;
+                window._lastAIResponse = { content: responseText, title, category, provider, model };
+                triggerToast("success", "AI Analysis complete!");
+            }).catch(err => {
+                resultBox.innerHTML = `
+                    <div style="text-align:center; padding:20px;">
+                        <svg style="width:36px; height:36px; fill:#ef4444; margin-bottom:8px;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                        <p style="font-size:13px; color:#ef4444; font-weight:600;">AI Analysis Failed</p>
+                        <p style="font-size:11px; color:var(--text-secondary); margin-top:4px;">${err.message}</p>
+                    </div>
+                `;
+                triggerToast("error", "AI analysis failed: " + err.message);
+            });
+        }
+
+        function saveAIAnalysis(defaultCategory) {
+            const data = window._lastAIResponse;
+            if (!data) { triggerToast("warning", "No analysis to save."); return; }
+            db.collection("ai_analyses").add({
+                title: data.title || "Untitled Analysis",
+                category: data.category || defaultCategory || "general",
+                content: data.content,
+                provider: data.provider,
+                model: data.model,
+                noteContent: document.getElementById("prodNoteContent")?.value?.trim() || "",
+                createdAt: new Date().toISOString(),
+                createdBy: (firebase.auth().currentUser || {}).email || "unknown"
+            }).then(() => {
+                triggerToast("success", "Analysis saved to history.");
+                window._lastAIResponse = null;
+            }).catch(err => {
+                triggerToast("error", "Failed to save analysis: " + err.message);
+            });
+        }
+
+        function renderAIAnalysisHistory() {
+            const container = document.getElementById("aiAnalysisHistoryContainer");
+            if (!container) return;
+            if (dbAIAnalyses.length === 0) {
+                container.innerHTML = '<p style="font-size:13px; color:var(--text-secondary); text-align:center; padding:20px;">কোনো analysis এখনো করা হয়নি।</p>';
+                return;
+            }
+            let html = '<div style="display:flex; flex-direction:column; gap:12px;">';
+            dbAIAnalyses.forEach(a => {
+                html += `
+                    <div style="background:rgba(255,255,255,0.03); border:1px solid var(--glass-border); border-radius:12px; padding:15px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <span style="font-weight:700; font-size:13px; color:var(--text-primary);">${a.title || 'Analysis'}</span>
+                            <div style="display:flex; gap:6px; align-items:center;">
+                                <span style="font-size:10px; background:rgba(46,189,89,0.15); color:var(--primary-accent); padding:2px 8px; border-radius:10px;">${a.category || 'general'}</span>
+                                <span style="font-size:10px; color:var(--text-secondary);">${a.provider || ''} | ${a.model || ''}</span>
+                            </div>
+                        </div>
+                        <div style="font-size:12px; color:var(--text-secondary); line-height:1.6; max-height:200px; overflow-y:auto;">${a.content}</div>
+                        <div style="margin-top:8px; display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:10px; color:var(--text-secondary);">${new Date(a.createdAt).toLocaleString()}</span>
+                            <button class="btn-delete btn-small" style="padding:3px 8px; font-size:10px;" onclick="deleteAIAnalysis('${a.id}')">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function deleteAIAnalysis(analysisId) {
+            if (!confirm("এই analysis ডিলিট করতে চান?")) return;
+            db.collection("ai_analyses").doc(analysisId).delete().then(() => {
+                triggerToast("success", "Analysis deleted.");
+            });
+        }
     </script>
 </body>
 </html>
