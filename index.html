@@ -1174,6 +1174,387 @@ table.admin-table tbody tr:hover td {
                 grid-template-columns: 1fr;
             }
         }
+
+        /* ==========================================================================
+           AI ASSISTANT CHAT SYSTEM STYLES
+           ========================================================================== */
+        #ai-chat-btn {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            z-index: 100001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 24px rgba(16,185,129,0.45);
+            transition: all 0.3s cubic-bezier(0.25,0.8,0.25,1);
+        }
+        #ai-chat-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 32px rgba(16,185,129,0.6);
+        }
+        #ai-chat-btn svg { width: 26px; height: 26px; fill: #fff; }
+
+        @keyframes aiPulse {
+            0%,100% { box-shadow: 0 6px 24px rgba(16,185,129,0.45); }
+            50% { box-shadow: 0 6px 24px rgba(16,185,129,0.45), 0 0 0 10px rgba(16,185,129,0.15); }
+        }
+        #ai-chat-btn.pulse { animation: aiPulse 2s infinite; }
+
+        #ai-chat-panel {
+            position: fixed;
+            top: 0;
+            right: -420px;
+            width: 400px;
+            max-width: 100vw;
+            height: 100vh;
+            background: rgba(15,23,42,0.97);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-left: 1px solid var(--glass-border);
+            z-index: 100002;
+            display: flex;
+            flex-direction: column;
+            transition: right 0.35s cubic-bezier(0.25,0.8,0.25,1);
+            box-shadow: -8px 0 40px rgba(0,0,0,0.5);
+        }
+        #ai-chat-panel.open { right: 0; }
+
+        .ai-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(15,23,42,0.5);
+        }
+        .ai-panel-header h3 {
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .ai-panel-header h3 span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary-accent);
+            display: inline-block;
+        }
+        .ai-close-btn {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .ai-close-btn:hover { background: rgba(255,255,255,0.12); }
+
+        .ai-chat-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .ai-msg {
+            max-width: 92%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 13px;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+        .ai-msg-user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+        .ai-msg-ai {
+            align-self: flex-start;
+            background: rgba(255,255,255,0.06);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+            border-bottom-left-radius: 4px;
+        }
+        .ai-msg-ai .ai-msg-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--primary-accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .ai-msg-preview-box {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 8px;
+        }
+        .ai-msg-preview-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            font-size: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .ai-msg-preview-row:last-child { border-bottom: none; }
+        .ai-msg-preview-row .k { color: var(--text-secondary); }
+        .ai-msg-preview-row .v { font-weight: 600; color: var(--text-primary); }
+
+        .ai-msg-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .ai-msg-actions button {
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+        .ai-btn-confirm {
+            background: var(--primary-accent);
+            color: #fff;
+        }
+        .ai-btn-confirm:hover { background: #0d9668; }
+        .ai-btn-cancel {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--glass-border) !important;
+            color: var(--text-secondary);
+        }
+        .ai-btn-cancel:hover { background: rgba(255,255,255,0.1); }
+
+        .ai-msg-loading {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+        }
+        .ai-msg-loading .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--primary-accent);
+            animation: aiDotPulse 1.2s infinite;
+        }
+        .ai-msg-loading .dot:nth-child(2) { animation-delay: 0.2s; }
+        .ai-msg-loading .dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes aiDotPulse {
+            0%,80%,100% { opacity: 0.3; transform: scale(0.8); }
+            40% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .ai-chat-footer {
+            padding: 12px 16px;
+            border-top: 1px solid var(--glass-border);
+            background: rgba(15,23,42,0.5);
+        }
+        .ai-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+        .ai-input-row textarea {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            resize: none;
+            height: 42px;
+            max-height: 120px;
+            line-height: 1.4;
+            transition: border-color 0.2s;
+        }
+        .ai-input-row textarea:focus {
+            border-color: var(--primary-accent);
+            outline: none;
+        }
+        .ai-send-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: var(--primary-accent);
+            border: none;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        .ai-send-btn:hover { background: #0d9668; }
+        .ai-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .ai-send-btn svg { width: 18px; height: 18px; fill: #fff; }
+
+        .ai-quick-chips {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .ai-quick-chip {
+            padding: 5px 10px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--glass-border);
+            font-size: 11px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .ai-quick-chip:hover {
+            background: rgba(16,185,129,0.12);
+            border-color: rgba(16,185,129,0.3);
+            color: var(--primary-accent);
+        }
+
+        .ai-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 100001;
+            display: none;
+        }
+        .ai-overlay.open { display: block; }
+
+        @media (max-width: 480px) {
+            #ai-chat-panel {
+                width: 100vw;
+                right: -100vw;
+            }
+            #ai-chat-panel.open { right: 0; }
+            #ai-chat-btn {
+                bottom: 90px;
+                right: 16px;
+            }
+        }
+
+        /* ========== AI AUTO-SAVE PERMISSION DIALOG ========== */
+        .ai-perm-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.6); z-index: 100100;
+            display: none; align-items: center; justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .ai-perm-overlay.open { display: flex; }
+        .ai-perm-dialog {
+            background: var(--card-bg, rgba(15,23,42,0.95));
+            border: 1px solid var(--glass-border);
+            border-radius: 16px; padding: 28px 24px;
+            width: 90%; max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            text-align: center;
+            animation: aiPermSlideIn 0.3s ease;
+        }
+        @keyframes aiPermSlideIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .ai-perm-icon { font-size: 36px; margin-bottom: 10px; }
+        .ai-perm-title {
+            font-size: 16px; font-weight: 800; color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        .ai-perm-section {
+            font-size: 13px; font-weight: 700; color: var(--primary-accent);
+            margin-bottom: 8px;
+        }
+        .ai-perm-desc {
+            font-size: 12px; color: var(--text-secondary); line-height: 1.6;
+            margin-bottom: 18px;
+        }
+        .ai-perm-btns { display: flex; flex-direction: column; gap: 8px; }
+        .ai-perm-btn {
+            padding: 12px 16px; border-radius: 10px; font-size: 13px;
+            font-weight: 700; cursor: pointer; border: none;
+            transition: all 0.2s ease; text-align: center;
+        }
+        .ai-perm-btn-yes {
+            background: linear-gradient(135deg, var(--primary-accent), #0d9668);
+            color: #fff;
+        }
+        .ai-perm-btn-yes:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(46,189,89,0.3); }
+        .ai-perm-btn-no {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--glass-border) !important;
+            color: var(--text-secondary);
+        }
+        .ai-perm-btn-no:hover { background: rgba(255,255,255,0.1); }
+
+        /* Auto-save success chat message */
+        .ai-autosave-success {
+            background: rgba(46,189,89,0.08);
+            border: 1px solid rgba(46,189,89,0.2);
+            border-radius: 10px; padding: 12px 14px; margin-top: 6px;
+        }
+        .ai-autosave-success .ai-autosave-label {
+            font-size: 11px; font-weight: 700; color: var(--primary-accent);
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+        }
+        .ai-autosave-success .ai-autosave-data {
+            font-size: 12px; color: var(--text-secondary); line-height: 1.5;
+        }
+        .ai-autosave-success .ai-autosave-data strong {
+            color: var(--text-primary);
+        }
+
+        /* Permission toggle switches in AI Settings */
+        .ai-perm-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+        .ai-perm-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 14px; background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border); border-radius: 10px;
+        }
+        .ai-perm-row-label {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; font-weight: 600; color: var(--text-primary);
+        }
+        .ai-perm-switch {
+            position: relative; width: 42px; height: 22px; cursor: pointer;
+        }
+        .ai-perm-switch input { opacity: 0; width: 0; height: 0; }
+        .ai-perm-switch .slider {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.1); border-radius: 22px;
+            transition: all 0.3s ease;
+        }
+        .ai-perm-switch .slider:before {
+            content: ""; position: absolute; height: 16px; width: 16px;
+            left: 3px; bottom: 3px; background: var(--text-secondary);
+            border-radius: 50%; transition: all 0.3s ease;
+        }
+        .ai-perm-switch input:checked + .slider {
+            background: var(--primary-accent);
+        }
+        .ai-perm-switch input:checked + .slider:before {
+            transform: translateX(20px); background: #fff;
+        }
     </style>
 </head>
 <body>
@@ -1967,63 +2348,53 @@ table.admin-table tbody tr:hover td {
                         </div>
                     </div>
 
-                    <!-- Production Notes + AI Analysis Section -->
+                    <!-- Raw Material Purchase Log -->
                     <div class="settings-split-grid" style="margin-top:25px; gap:16px;">
-                        <!-- Left: Notes Editor -->
                         <div class="panel-card">
                             <div class="panel-header">
-                                <h2>Production Notes (নোটস)</h2>
-                                <p style="font-size:11px; color:var(--text-secondary); margin-top:2px;">কাঁচামাল, খরচ, সমস্যা, পরিকল্পনা - যেকোনো কিছু লিখুন। AI বিশ্লেষণ করবে।</p>
+                                <h2>Raw Material Purchase Log (কাঁচামাল ক্রয়)</h2>
+                                <p style="font-size:11px; color:var(--text-secondary); margin-top:2px;">বাজার থেকে কী কী নিয়ে এসেছো সেটা লিখুন। AI parsed হয়ে inventory তে যোগ হবে।</p>
                             </div>
                             <div class="input-group">
-                                <label>Note Title</label>
-                                <input type="text" id="prodNoteTitle" class="form-control" placeholder="যেমন: সিরা ব্যাচ #45 বিশ্লেষণ">
+                                <label>Purchase Date</label>
+                                <input type="date" id="purchaseDate" class="form-control">
                             </div>
                             <div class="input-group" style="margin-top:8px;">
-                                <label>Category</label>
-                                <select id="prodNoteCategory" class="form-control">
-                                    <option value="raw_material">Raw Material / কাঁচামাল</option>
-                                    <option value="cost_analysis">Cost Analysis / খরচ বিশ্লেষণ</option>
-                                    <option value="quality">Quality / মান নিয়ন্ত্রণ</option>
-                                    <option value="waste">Waste / অপচয়</option>
-                                    <option value="planning">Planning / পরিকল্পনা</option>
-                                    <option value="general">General / সাধারণ</option>
-                                </select>
+                                <label>Purchase Details (ফ্রি-ফর্ম)</label>
+                                <textarea id="purchaseInput" class="form-control" style="height:150px; font-size:13px; line-height:1.7;" placeholder="যেমন:&#10;ময়দা ২০ কেজি ৳৬০০&#10;তেল ৫ লিটার ৳৫০০&#10;চিনি ১০ কেজি ৳৮০০&#10;আলু ১৫ কেজি ৳৩০০&#10;মরিচ ২ কেজি ৳২০০&#10;দুধ ১০ লিটার ৳৫০০"></textarea>
                             </div>
-                            <div class="input-group" style="margin-top:8px;">
-                                <label>Notes Content</label>
-                                <textarea id="prodNoteContent" class="form-control" style="height:150px; min-height:120px; font-size:13px; line-height:1.6;" placeholder="আপনার নোট লিখুন...&#10;&#10;যেমন:&#10;- আজকে চিনির দাম ৳১২০/kg ছিল&#10;- মোট ৫০kg ব্যবহার করেছি&#10;- গত সপ্তাহের তুলনায় ১০% বেশি খরচ হয়েছে&#10;- বিক্রয় মূল্য বাড়ানো প্রয়োজন হতে পারে"></textarea>
-                            </div>
-                            <div style="display:flex; gap:10px; margin-top:12px;">
-                                <button type="button" class="btn-action btn-small" style="width:auto;" onclick="saveProductionNote()">Save Note</button>
-                                <button type="button" class="btn-secondary btn-small" style="width:auto;" onclick="analyzeProductionNote()">AI Analyze Note</button>
-                            </div>
-                            <div id="prodNoteStatus" style="margin-top:8px; font-size:12px; color:var(--text-secondary);"></div>
+                            <button type="button" class="btn-action btn-small" style="width:auto; margin-top:10px;" onclick="parseAndSavePurchase()">AI Parse & Save Purchase</button>
+                            <div id="purchaseParseResult" style="margin-top:10px;"></div>
                         </div>
-
-                        <!-- Right: AI Analysis Result -->
                         <div class="panel-card">
                             <div class="panel-header">
-                                <h2>AI Analysis Result</h2>
-                                <p style="font-size:11px; color:var(--text-secondary); margin-top:2px;">AI নোট এবং ব্যাচ ডেটা বিশ্লেষণ করে সুপারিশ দেবে।</p>
+                                <h2>Current Inventory (বর্তমান স্টক)</h2>
+                                <p style="font-size:11px; color:var(--text-secondary); margin-top:2px;">ক্রয় থেকে ব্যবহার বাদ দিয়ে বাকি স্টক</p>
                             </div>
-                            <div id="aiAnalysisResult" style="background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:12px; padding:20px; min-height:300px;">
-                                <div style="text-align:center; padding:40px 20px;">
-                                    <svg style="width:48px; height:48px; fill:var(--text-secondary); opacity:0.3; margin-bottom:12px;" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
-                                    <p style="font-size:13px; color:var(--text-secondary);">বাম পাশে নোট লিখে "AI Analyze Note" চাপুন।</p>
-                                    <p style="font-size:11px; color:var(--text-secondary); margin-top:6px;">AI স্বয়ংক্রিয়ভাবে সকল ব্যাচ ডেটা এবং আপনার নোট বিশ্লেষণ করবে।</p>
-                                </div>
+                            <div id="inventoryContainer" style="min-height:200px;">
+                                <p style="font-size:13px; color:var(--text-secondary); text-align:center; padding:30px;">কোনো স্টক নেই। উপরে ক্রয়ের হিসাব দিন।</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Saved Notes List -->
+                    <!-- Production vs Sales Dashboard -->
                     <div class="panel-card" style="margin-top:25px;">
                         <div class="panel-header">
-                            <h2>Saved Notes History</h2>
+                            <h2>Production vs Sales Dashboard</h2>
+                            <button type="button" class="btn-action btn-small" style="width:auto;" onclick="refreshProdSalesDashboard()">Refresh Dashboard</button>
                         </div>
-                        <div id="savedProductionNotesContainer">
-                            <p style="font-size:13px; color:var(--text-secondary); text-align:center; padding:20px;">এখনো কোনো নোট সেভ করা হয়নি।</p>
+                        <div id="prodSalesDashboard">
+                            <p style="font-size:13px; color:var(--text-secondary); text-align:center; padding:30px;">Dashboard লোড হচ্ছে...</p>
+                        </div>
+                    </div>
+
+                    <!-- Purchase History -->
+                    <div class="panel-card" style="margin-top:25px;">
+                        <div class="panel-header">
+                            <h2>Purchase History (ক্রয়ের ইতিহাস)</h2>
+                        </div>
+                        <div id="purchaseHistoryContainer">
+                            <p style="font-size:13px; color:var(--text-secondary); text-align:center; padding:20px;">এখনো কোনো ক্রয়ের হিসাব নেই।</p>
                         </div>
                     </div>
                 </div>
@@ -3003,6 +3374,20 @@ table.admin-table tbody tr:hover td {
                             <p style="font-size:13px; color:var(--text-secondary); text-align:center; padding:20px;">কোনো analysis এখনো করা হয়নি। Production Costing Tab থেকে নোট লিখে AI Analyze করুন।</p>
                         </div>
                     </div>
+
+                    <div class="panel-card" style="margin-top:20px;">
+                        <div class="panel-header">
+                            <h2>AI Auto-Save Permissions</h2>
+                            <p style="font-size:11px; color:var(--text-secondary); margin-top:2px;">প্রতিটি সেকশনে AI অটো-সেভ চালু/বন্ধ করুন। ON = সরাসরি Firebase-এ সেভ হবে। OFF = Preview দেখাবে।</p>
+                        </div>
+                        <div class="ai-perm-grid" id="aiPermManagerGrid">
+                            <p style="font-size:13px; color:var(--text-secondary); text-align:center; padding:20px;">Loading...</p>
+                        </div>
+                        <div style="margin-top:12px; display:flex; gap:8px;">
+                            <button type="button" class="btn-secondary btn-small" style="width:auto;" onclick="renderPermManager()">Refresh</button>
+                            <button type="button" class="btn-delete btn-small" style="width:auto;" onclick="_resetAllPerms()">সব রিসেট করুন</button>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -3053,8 +3438,67 @@ table.admin-table tbody tr:hover td {
     </div>
 
     <!-- ==========================================================================
+       AI ASSISTANT FLOATING CHAT PANEL
+       ========================================================================== -->
+    <div class="ai-overlay" id="aiOverlay" onclick="toggleAIChat()"></div>
+    <button id="ai-chat-btn" class="pulse" onclick="toggleAIChat()" title="AI Assistant — যেকোনো কাজ বলুন">
+        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/><path d="M7 9h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"/></svg>
+    </button>
+    <div id="ai-chat-panel">
+        <div class="ai-panel-header">
+            <h3><span></span> AI Assistant</h3>
+            <button class="ai-close-btn" onclick="toggleAIChat()">&times;</button>
+        </div>
+        <div class="ai-chat-body" id="aiChatBody">
+            <div class="ai-msg ai-msg-ai">
+                <div class="ai-msg-label">AI Assistant</div>
+                আমি Cafe.98 AI Assistant। আপনি যেকোনো কাজ বাংলা বা ইংরেজিতে বলুন — আমি অটো-ফিল করে দেবো।
+                <br><br>
+                <strong>উদাহরণ:</strong><br>
+                • "আজকে ময়দা ২০ কেজি কিনেছি ৳৬০০ তে"<br>
+                • "নতুন মেনু: Chicken Burger ৳২৫০"<br>
+                • "Rahman 0171123456 কে কালকে ৬টায় টার্ফ বুক দাও ৳১০০০"
+            </div>
+        </div>
+        <div class="ai-chat-footer">
+            <div class="ai-input-row">
+                <textarea id="aiChatInput" placeholder="আপনার কাজ বলুন..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAIMessage();}"></textarea>
+                <button class="ai-send-btn" id="aiSendBtn" onclick="sendAIMessage()">
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+            </div>
+            <div class="ai-quick-chips">
+                <span class="ai-quick-chip" onclick="quickAIMsg('নতুন মেনু আইটেম যোগ করতে চাই')">+ Menu Item</span>
+                <span class="ai-quick-chip" onclick="quickAIMsg('নতুন টার্ফ বুকিং করতে চাই')">+ Turf Booking</span>
+                <span class="ai-quick-chip" onclick="quickAIMsg('খরচ যোগ করতে চাই')">+ Expense</span>
+                <span class="ai-quick-chip" onclick="quickAIMsg('কাঁচামাল ক্রয় যোগ করতে চাই')">+ Purchase</span>
+                <span class="ai-quick-chip" onclick="quickAIMsg('প্রোডাকশন ব্যাচ এন্ট্রি করতে চাই')">+ Production</span>
+                <span class="ai-quick-chip" onclick="quickAIMsg('ইনভয়েস সেটিংস আপডেট করতে চাই')">+ Invoice</span>
+                <span class="ai-quick-chip" onclick="quickAIMsg('থিম পরিবর্তন করতে চাই')">+ Theme</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI AUTO-SAVE PERMISSION DIALOG -->
+    <div class="ai-perm-overlay" id="aiPermOverlay">
+        <div class="ai-perm-dialog">
+            <div class="ai-perm-icon" id="aiPermIcon">🤖</div>
+            <div class="ai-perm-title">AI অটো-সেভ অনুমতি</div>
+            <div class="ai-perm-section" id="aiPermSectionLabel">Section</div>
+            <div class="ai-perm-desc">
+                AI এই সেকশনে সরাসরি Firebase-এ ডেটা সেভ করতে চায়।<br>
+                অনুমতি দিলে পরবর্তী সময় থেকে অটোমেটিক সেভ হবে, আপনাকে আলাদাভাবে Confirm করতে হবে না।
+            </div>
+            <div class="ai-perm-btns">
+                <button class="ai-perm-btn ai-perm-btn-yes" onclick="_resolvePermDialog(true)">✅ হ্যাঁ, অটো-সেভ চালু করো</button>
+                <button class="ai-perm-btn ai-perm-btn-no" onclick="_resolvePermDialog(false)">🚫 না, শুধু ফিল করো (Confirm দেখাও)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
        VANILLA JAVASCRIPT LOGIC CONTROLLER
-       ========================================================================== */ -->
+       ========================================================================== -->
     <!-- Firebase compatibility SDK scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -3281,6 +3725,8 @@ table.admin-table tbody tr:hover td {
         let dbProductionBatches = [];
         let dbAISettings = {};
         let dbAIAnalyses = [];
+        let dbRawMaterials = [];
+        let dbInventory = [];
         let lastQuickSale = null; 
 
         let posCart = [];
@@ -3516,6 +3962,26 @@ table.admin-table tbody tr:hover td {
                 try { renderAIAnalysisHistory(); } catch(e) {}
             }, err => { console.warn("Firestore AI analyses listen error blocked:", err.message); });
             activeListeners.push(unsub23);
+
+            const unsub24 = db.collection("raw_materials_purchase").orderBy("createdAt", "desc").limit(100).onSnapshot(snapshot => {
+                dbRawMaterials = [];
+                snapshot.forEach(doc => {
+                    dbRawMaterials.push({ id: doc.id, ...doc.data() });
+                });
+                try { renderPurchaseHistory(); } catch(e) {}
+                try { refreshProdSalesDashboard(); } catch(e) {}
+            }, err => { console.warn("Firestore raw materials listen error blocked:", err.message); });
+            activeListeners.push(unsub24);
+
+            const unsub25 = db.collection("inventory").onSnapshot(snapshot => {
+                dbInventory = [];
+                snapshot.forEach(doc => {
+                    dbInventory.push({ id: doc.id, ...doc.data() });
+                });
+                try { renderInventory(); } catch(e) {}
+                try { refreshProdSalesDashboard(); } catch(e) {}
+            }, err => { console.warn("Firestore inventory listen error blocked:", err.message); });
+            activeListeners.push(unsub25);
         }
 
         /* ==========================================================================
@@ -3609,7 +4075,9 @@ table.admin-table tbody tr:hover td {
             }
             if (tabId === "production-costing") {
                 try { clearProductionForm(); loadProductionCostingTab(); } catch (e) { console.warn("Failed to load Production Costing: ", e); }
-                try { loadProductionNotes(); } catch (e) {}
+                try { document.getElementById("purchaseDate").value = new Date().toISOString().slice(0, 10); } catch(e) {}
+                try { renderInventory(); } catch(e) {}
+                try { refreshProdSalesDashboard(); } catch(e) {}
             }
             if (tabId === "dues") {
                 try { loadDueManagement(); } catch (e) { console.warn("Due management failed to load: ", e); }
@@ -3808,7 +4276,7 @@ table.admin-table tbody tr:hover td {
                     desc: 'Total sales from restaurant invoices & quick sales today',
                     current: '\u09F3 ' + grandTodaySales.toLocaleString(),
                     previous: '\u09F3 ' + grandYesterdaySales.toLocaleString(),
-                    growth: todaySalesArrow + ' ' + todaySalesGrowth + '%',
+                    growth: todaySalesGrowthArrow + ' ' + todaySalesGrowth + '%',
                     growthColor: todaySalesGrowthColor,
                     updated: nowTime
                 },
@@ -5214,6 +5682,55 @@ table.admin-table tbody tr:hover td {
             marginEl.style.color = profitMargin >= 0 ? "var(--primary-accent)" : "#ef4444";
         }
 
+        /* ========== INVENTORY AUTO-DEDUCT ON BATCH SAVE ========== */
+        function deductInventoryForBatch(ingredients) {
+            if (!ingredients || ingredients.length === 0) return Promise.resolve();
+            const promises = [];
+            ingredients.forEach(ing => {
+                if (!ing.name || !ing.qty) return;
+                const invQuery = db.collection("inventory").where("name", "==", ing.name);
+                promises.push(invQuery.get().then(snap => {
+                    if (!snap.empty) {
+                        const doc = snap.docs[0];
+                        const existing = doc.data();
+                        return db.collection("inventory").doc(doc.id).update({
+                            totalUsed: (existing.totalUsed || 0) + ing.qty,
+                            lastUpdated: new Date().toISOString()
+                        });
+                    } else {
+                        return db.collection("inventory").add({
+                            name: ing.name,
+                            totalPurchased: 0,
+                            totalUsed: ing.qty,
+                            unit: ing.unit || "kg",
+                            lastUpdated: new Date().toISOString()
+                        });
+                    }
+                }));
+            });
+            return Promise.all(promises);
+        }
+
+        function reverseInventoryForBatch(ingredients) {
+            if (!ingredients || ingredients.length === 0) return Promise.resolve();
+            const promises = [];
+            ingredients.forEach(ing => {
+                if (!ing.name || !ing.qty) return;
+                const invQuery = db.collection("inventory").where("name", "==", ing.name);
+                promises.push(invQuery.get().then(snap => {
+                    if (!snap.empty) {
+                        const doc = snap.docs[0];
+                        const existing = doc.data();
+                        return db.collection("inventory").doc(doc.id).update({
+                            totalUsed: Math.max(0, (existing.totalUsed || 0) - ing.qty),
+                            lastUpdated: new Date().toISOString()
+                        });
+                    }
+                }));
+            });
+            return Promise.all(promises);
+        }
+
         function saveProductionBatch(e) {
             e.preventDefault();
             const id = document.getElementById("prodBatchId").value;
@@ -5269,9 +5786,13 @@ table.admin-table tbody tr:hover td {
             if (user.email === "admin23@gmail.com") {
                 showGlobalLoader(true);
                 if (id) {
+                    const oldBatch = dbProductionBatches.find(b => b.id === id);
                     db.collection("production_batches").doc(id).set(batchData).then(() => {
+                        const reversePromise = (oldBatch && oldBatch.ingredients) ? reverseInventoryForBatch(oldBatch.ingredients) : Promise.resolve();
+                        return reversePromise.then(() => deductInventoryForBatch(ingredients));
+                    }).then(() => {
                         showGlobalLoader(false);
-                        triggerToast("success", "Batch details saved directly.");
+                        triggerToast("success", "Batch saved & inventory updated.");
                         clearProductionForm();
                         logSystemActivity(`Modified production batch: ${itemName}`);
                     }).catch(() => {
@@ -5281,8 +5802,10 @@ table.admin-table tbody tr:hover td {
                 } else {
                     const newId = "PB-" + Math.floor(100000 + Math.random() * 900000);
                     db.collection("production_batches").doc(newId).set({ id: newId, ...batchData }).then(() => {
+                        return deductInventoryForBatch(ingredients);
+                    }).then(() => {
                         showGlobalLoader(false);
-                        triggerToast("success", "New production batch registered directly.");
+                        triggerToast("success", "New batch registered & inventory updated.");
                         clearProductionForm();
                         logSystemActivity(`Logged new production batch: ${itemName}`);
                     }).catch(() => {
@@ -5321,8 +5844,10 @@ table.admin-table tbody tr:hover td {
                     showGlobalLoader(true);
                     const newId = "PB-" + Math.floor(100000 + Math.random() * 900000);
                     db.collection("production_batches").doc(newId).set({ id: newId, ...batchData }).then(() => {
+                        return deductInventoryForBatch(ingredients);
+                    }).then(() => {
                         showGlobalLoader(false);
-                        triggerToast("success", "New production batch registered.");
+                        triggerToast("success", "New batch registered & inventory updated.");
                         clearProductionForm();
                         logSystemActivity(`Registered production batch: ${itemName} by ${currentStaffData.name}`);
                     }).catch(() => {
@@ -5367,9 +5892,14 @@ table.admin-table tbody tr:hover td {
             if (user.email === "admin23@gmail.com") {
                 if (confirm("Are you sure you want to delete this batch directly?")) {
                     showGlobalLoader(true);
+                    const batchToDelete = dbProductionBatches.find(b => b.id === id);
                     db.collection("production_batches").doc(id).delete().then(() => {
+                        if (batchToDelete && batchToDelete.ingredients) {
+                            return reverseInventoryForBatch(batchToDelete.ingredients);
+                        }
+                    }).then(() => {
                         showGlobalLoader(false);
-                        triggerToast("success", "Production batch deleted directly.");
+                        triggerToast("success", "Batch deleted & inventory restored.");
                         logSystemActivity(`Production batch ${id} deleted directly by Admin`);
                     }).catch(() => {
                         showGlobalLoader(false);
@@ -7847,8 +8377,19 @@ table.admin-table tbody tr:hover td {
             }
 
             batch.commit().then(() => {
+                const invPromises = [];
+                if (req.type === "delete_batch" && req.originalData && req.originalData.ingredients) {
+                    invPromises.push(reverseInventoryForBatch(req.originalData.ingredients));
+                } else if (req.type === "edit_batch" && req.proposedData && req.proposedData.ingredients) {
+                    if (req.originalData && req.originalData.ingredients) {
+                        invPromises.push(reverseInventoryForBatch(req.originalData.ingredients));
+                    }
+                    invPromises.push(deductInventoryForBatch(req.proposedData.ingredients));
+                }
+                return Promise.all(invPromises);
+            }).then(() => {
                 showGlobalLoader(false);
-                triggerToast("success", "Approval request committed and executed successfully.");
+                triggerToast("success", "Approval request committed and inventory updated.");
                 logSystemActivity(`Approved staff action: ${req.type} for ${req.targetId}`);
             }).catch(err => {
                 showGlobalLoader(false);
@@ -7928,6 +8469,7 @@ table.admin-table tbody tr:hover td {
                 });
             }
             renderAIAnalysisHistory();
+            renderPermManager();
         }
 
         function saveAISettings(e) {
@@ -7990,201 +8532,6 @@ table.admin-table tbody tr:hover td {
             });
         }
 
-        let dbProductionNotes = [];
-
-        function loadProductionNotes() {
-            db.collection("production_notes").orderBy("createdAt", "desc").limit(30).get().then(snap => {
-                dbProductionNotes = [];
-                snap.forEach(doc => dbProductionNotes.push({ id: doc.id, ...doc.data() }));
-                renderSavedNotes();
-            });
-        }
-
-        function saveProductionNote() {
-            const title = document.getElementById("prodNoteTitle").value.trim();
-            const category = document.getElementById("prodNoteCategory").value;
-            const content = document.getElementById("prodNoteContent").value.trim();
-            if (!title || !content) {
-                triggerToast("warning", "Title এবং Content দুটোই দিতে হবে।");
-                return;
-            }
-            const noteData = {
-                title, category, content,
-                createdAt: new Date().toISOString(),
-                createdBy: (firebase.auth().currentUser || {}).email || "unknown"
-            };
-            db.collection("production_notes").add(noteData).then(() => {
-                document.getElementById("prodNoteTitle").value = "";
-                document.getElementById("prodNoteContent").value = "";
-                document.getElementById("prodNoteStatus").innerHTML = '<span style="color:var(--primary-accent)">Note saved successfully.</span>';
-                triggerToast("success", "Note saved.");
-                loadProductionNotes();
-            }).catch(err => {
-                triggerToast("error", "Failed to save note: " + err.message);
-            });
-        }
-
-        function renderSavedNotes() {
-            const container = document.getElementById("savedProductionNotesContainer");
-            if (!container) return;
-            if (dbProductionNotes.length === 0) {
-                container.innerHTML = '<p style="font-size:13px; color:var(--text-secondary); text-align:center; padding:20px;">এখনো কোনো নোট সেভ করা হয়নি।</p>';
-                return;
-            }
-            const catLabels = { raw_material: "Raw Material", cost_analysis: "Cost Analysis", quality: "Quality", waste: "Waste", planning: "Planning", general: "General" };
-            let html = '<div style="display:flex; flex-direction:column; gap:10px;">';
-            dbProductionNotes.forEach(n => {
-                html += `
-                    <div style="background:rgba(255,255,255,0.03); border:1px solid var(--glass-border); border-radius:10px; padding:12px 15px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                            <span style="font-weight:700; font-size:13px; color:var(--text-primary);">${n.title}</span>
-                            <span style="font-size:10px; background:rgba(46,189,89,0.15); color:var(--primary-accent); padding:2px 8px; border-radius:10px;">${catLabels[n.category] || n.category}</span>
-                        </div>
-                        <p style="font-size:12px; color:var(--text-secondary); line-height:1.5; white-space:pre-wrap; margin:0;">${n.content}</p>
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-                            <span style="font-size:10px; color:var(--text-secondary);">${new Date(n.createdAt).toLocaleString('bn-BD')}</span>
-                            <button class="btn-delete btn-small" style="padding:3px 8px; font-size:10px;" onclick="deleteProductionNote('${n.id}')">Delete</button>
-                        </div>
-                    </div>
-                `;
-            });
-            html += '</div>';
-            container.innerHTML = html;
-        }
-
-        function deleteProductionNote(noteId) {
-            if (!confirm("নোট ডিলিট করতে চান?")) return;
-            db.collection("production_notes").doc(noteId).delete().then(() => {
-                triggerToast("success", "Note deleted.");
-                loadProductionNotes();
-            });
-        }
-
-        function analyzeProductionNote() {
-            const title = document.getElementById("prodNoteTitle").value.trim();
-            const category = document.getElementById("prodNoteCategory").value;
-            const content = document.getElementById("prodNoteContent").value.trim();
-            if (!content) {
-                triggerToast("warning", "AI Analyze করার জন্য প্রথমে নোট লিখুন।");
-                return;
-            }
-            const provider = dbAISettings.provider || "openrouter";
-            let apiKey, model;
-            if (provider === "openrouter") {
-                apiKey = dbAISettings.openRouterKey;
-                model = dbAISettings.openRouterModel || "google/gemini-3.5-flash";
-            } else {
-                apiKey = dbAISettings.googleKey;
-                model = dbAISettings.googleModel || "gemini-3.5-flash";
-            }
-            if (!apiKey) {
-                triggerToast("warning", "AI Settings এ API Key সেট করুন। (AI Settings Tab)");
-                return;
-            }
-
-            const resultBox = document.getElementById("aiAnalysisResult");
-            resultBox.innerHTML = `
-                <div style="text-align:center; padding:40px;">
-                    <div style="width:32px; height:32px; border:3px solid var(--primary-accent); border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 12px;"></div>
-                    <p style="font-size:13px; color:var(--primary-accent); font-weight:600;">AI বিশ্লেষণ করছে...</p>
-                    <p style="font-size:11px; color:var(--text-secondary); margin-top:4px;">Production data + Notes processing</p>
-                </div>
-            `;
-
-            let batchSummary = "";
-            if (dbProductionBatches.length > 0) {
-                const recent = [...dbProductionBatches].sort((a, b) => (b.date || "").localeCompare(a.date || "")).slice(0, 10);
-                batchSummary = "\n\n--- Recent Production Batches (Last 10) ---\n";
-                recent.forEach((b, i) => {
-                    batchSummary += `Batch ${i+1}: ${b.itemName || 'N/A'} | Date: ${b.date} | Cost: ৳${b.totalCost} | Units: ${b.outputQty} ${b.outputUnit} | Cost/Unit: ৳${b.costPerUnit} | Sale: ৳${b.salePrice} | Profit: ৳${b.totalProfit} (${b.profitMargin}%)\n`;
-                    if (b.ingredients && b.ingredients.length > 0) {
-                        b.ingredients.forEach(ing => {
-                            batchSummary += `  - ${ing.name}: ${ing.qty} ${ing.unit} @ ৳${ing.price}\n`;
-                        });
-                    }
-                });
-            }
-
-            const prompt = `তুমি একজন প্রোডাকশন কস্ট অ্যানালিস্ট। তুমি Cafe/Restaurant ব্যবসার (Bangladesh, BDT মুদ্রা) জন্য কাজ করো। নিচের প্রোডাকশন নোট এবং ব্যাচ ডেটা বিশ্লেষণ করো। উত্তর সবসময় বাংলায় দাও।
-
-বিশ্লেষণ করো এবং দাও:
-
-1. **খরচ বিশ্লেষণ** - বর্তমান খরচের অবস্থা, প্রবণতা
-2. **মূল পর্যবেক্ষণ** - গুরুত্বপূর্ণ প্যাটার্ন বা সমস্যা
-3. **সুপারিশ** - কার্যকর পরামর্শ (সর্বোচ্চ ৫টি)
-4. **ঝুঁকি মূল্যায়ন** - সম্ভাব্য সমস্যা যার দিকে খেয়াল রাখতে হবে
-5. **লাভের উপর প্রভাব** - পর্যবেক্ষণগুলো লাভে কীভাবে প্রভাব ফেলবে
-
-গুরুত্বপূর্ণ: উত্তর বাংলায় দাও। HTML format এ দাও (<h4>, <p>, <ul><li>, <strong>, <em> ব্যবহার করো)। সংক্ষিপ্ত কিন্তু বিস্তারিত রাখো। BDT পরিমাণের জন্য ৳ ব্যবহার করো।
-
---- ইউজারের নোট ---
-শিরোনাম: ${title || 'শিরোনামহীন'}
-ক্যাটাগরি: ${category}
-বিষয়বস্তু: ${content}
-${batchSummary}`;
-
-            const callOpenRouter = (apiKey, model) => {
-                return fetch("https://openrouter.ai/api/v1/chat/completions", {
-                    method: "POST",
-                    headers: { "Authorization": "Bearer " + apiKey, "Content-Type": "application/json", "HTTP-Referer": window.location.origin },
-                    body: JSON.stringify({ model: model, messages: [{ role: "user", content: prompt }], max_tokens: 2000, temperature: 0.7 })
-                }).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-                  .then(d => d.choices?.[0]?.message?.content || "No response");
-            };
-
-            const callGoogleAI = (apiKey, model) => {
-                return fetch("https://generativelanguage.googleapis.com/v1beta/models/" + model + ":generateContent", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { maxOutputTokens: 2000, temperature: 0.7 } })
-                }).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-                  .then(d => d.candidates?.[0]?.content?.parts?.[0]?.text || "No response");
-            };
-
-            const apiCall = provider === "openrouter" ? callOpenRouter(apiKey, model) : callGoogleAI(apiKey, model);
-
-            apiCall.then(responseText => {
-                resultBox.innerHTML = `
-                    <div style="font-size:13px; line-height:1.7; color:var(--text-primary);">${responseText}</div>
-                    <div style="margin-top:16px; padding-top:12px; border-top:1px solid var(--glass-border); display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:10px; color:var(--text-secondary);">${new Date().toLocaleString()} | ${provider.toUpperCase()} | ${model}</span>
-                        <button class="btn-action btn-small" style="width:auto; padding:5px 12px; font-size:11px;" onclick="saveAIAnalysis('${category}')">Save Analysis</button>
-                    </div>
-                `;
-                window._lastAIResponse = { content: responseText, title, category, provider, model };
-                triggerToast("success", "AI Analysis complete!");
-            }).catch(err => {
-                resultBox.innerHTML = `
-                    <div style="text-align:center; padding:20px;">
-                        <svg style="width:36px; height:36px; fill:#ef4444; margin-bottom:8px;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-                        <p style="font-size:13px; color:#ef4444; font-weight:600;">AI Analysis Failed</p>
-                        <p style="font-size:11px; color:var(--text-secondary); margin-top:4px;">${err.message}</p>
-                    </div>
-                `;
-                triggerToast("error", "AI analysis failed: " + err.message);
-            });
-        }
-
-        function saveAIAnalysis(defaultCategory) {
-            const data = window._lastAIResponse;
-            if (!data) { triggerToast("warning", "No analysis to save."); return; }
-            db.collection("ai_analyses").add({
-                title: data.title || "Untitled Analysis",
-                category: data.category || defaultCategory || "general",
-                content: data.content,
-                provider: data.provider,
-                model: data.model,
-                noteContent: document.getElementById("prodNoteContent")?.value?.trim() || "",
-                createdAt: new Date().toISOString(),
-                createdBy: (firebase.auth().currentUser || {}).email || "unknown"
-            }).then(() => {
-                triggerToast("success", "Analysis saved to history.");
-                window._lastAIResponse = null;
-            }).catch(err => {
-                triggerToast("error", "Failed to save analysis: " + err.message);
-            });
-        }
-
         function renderAIAnalysisHistory() {
             const container = document.getElementById("aiAnalysisHistoryContainer");
             if (!container) return;
@@ -8221,6 +8568,1327 @@ ${batchSummary}`;
                 triggerToast("success", "Analysis deleted.");
             });
         }
+
+        /* ========== RAW MATERIAL PURCHASE ========== */
+        function parseAndSavePurchase() {
+            const rawText = document.getElementById("purchaseInput").value.trim();
+            const purchaseDate = document.getElementById("purchaseDate").value;
+            if (!rawText) {
+                triggerToast("warning", "ক্রয়ের বিবরণ লিখুন।");
+                return;
+            }
+            const resultDiv = document.getElementById("purchaseParseResult");
+            const provider = dbAISettings.provider || "openrouter";
+            let apiKey, model;
+            if (provider === "openrouter") {
+                apiKey = dbAISettings.openRouterKey;
+                model = dbAISettings.openRouterModel || "google/gemini-3.5-flash";
+            } else {
+                apiKey = dbAISettings.googleKey;
+                model = dbAISettings.googleModel || "gemini-3.5-flash";
+            }
+            if (!apiKey) {
+                triggerToast("warning", "AI Settings এ API Key সেট করুন।");
+                return;
+            }
+
+            resultDiv.innerHTML = '<div style="text-align:center;padding:10px;"><div style="width:24px;height:24px;border:3px solid var(--primary-accent);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 8px;"></div><p style="font-size:12px;color:var(--primary-accent);">AI পার্স করছে...</p></div>';
+
+            const prompt = `তুমি একটি Purchase Data Parser। বাংলা/ইংরেজি মিশ্রিত ফ্রি-ফর্ম টেক্সট থেকে কাঁচামাল ক্রয়ের ডেটা বের করো। শুধু JSON দাও।
+
+নিয়ম:
+- প্রতিটি আইটেমের নাম (name), পরিমাণ (qty number), একক (unit: kg/ltr/gm/pcs/packet), মূল্য (price number)
+- ৳, কমা বাদ দাও, শুধু number রাখো
+- একক না থাকলে default kg
+
+Output JSON (শুধু JSON):
+{"items": [{"name": "ময়দা", "qty": 20, "unit": "kg", "price": 600}]}
+
+--- ইনপুট ---
+${rawText}`;
+
+            const callAPI = (k, m) => {
+                const url = provider === "openrouter"
+                    ? "https://openrouter.ai/api/v1/chat/completions"
+                    : "https://generativelanguage.googleapis.com/v1beta/models/" + m + ":generateContent";
+                const headers = provider === "openrouter"
+                    ? { "Authorization": "Bearer " + k, "Content-Type": "application/json", "HTTP-Referer": window.location.origin }
+                    : { "Content-Type": "application/json", "x-goog-api-key": k };
+                const body = provider === "openrouter"
+                    ? JSON.stringify({ model: m, messages: [{ role: "user", content: prompt }], max_tokens: 1000, temperature: 0.2 })
+                    : JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { maxOutputTokens: 1000, temperature: 0.2 } });
+                return fetch(url, { method: "POST", headers, body })
+                    .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+                    .then(d => provider === "openrouter" ? (d.choices?.[0]?.message?.content || "") : (d.candidates?.[0]?.content?.parts?.[0]?.text || ""));
+            };
+
+            callAPI(apiKey, model).then(responseText => {
+                let jsonStr = responseText;
+                const match = responseText.match(/\{[\s\S]*\}/);
+                if (match) jsonStr = match[0];
+                let parsed;
+                try { parsed = JSON.parse(jsonStr); } catch(e) {
+                    resultDiv.innerHTML = '<p style="color:#ef4444;font-size:12px;">Parse error: ' + e.message + '</p>';
+                    return;
+                }
+                const items = parsed.items || [];
+                if (items.length === 0) {
+                    resultDiv.innerHTML = '<p style="color:#f59e0b;font-size:12px;">কোনো আইটেম পাওয়া যায়নি।</p>';
+                    return;
+                }
+
+                let preview = '<div style="background:rgba(46,189,89,0.08);border-radius:10px;padding:12px;margin-bottom:10px;">';
+                preview += '<p style="font-size:12px;font-weight:700;margin-bottom:8px;">Parsed Items (' + items.length + '):</p>';
+                let total = 0;
+                items.forEach(it => {
+                    const subtotal = it.qty * it.price;
+                    total += subtotal;
+                    preview += '<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);"><span>' + it.name + ' ' + it.qty + ' ' + it.unit + '</span><span style="font-weight:600;">৳' + subtotal.toLocaleString() + '</span></div>';
+                });
+                preview += '<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:800;margin-top:6px;padding-top:6px;border-top:1px dashed rgba(255,255,255,0.1);"><span>Total:</span><span style="color:var(--primary-accent);">৳' + total.toLocaleString() + '</span></div></div>';
+
+                preview += '<div style="display:flex;gap:8px;"><button class="btn-action btn-small" style="width:auto;" onclick="confirmPurchaseSave()">Confirm Save</button><button class="btn-secondary btn-small" style="width:auto;" onclick="document.getElementById(\'purchaseParseResult\').innerHTML=\'\'">Cancel</button></div>';
+
+                resultDiv.innerHTML = preview;
+                window._parsedPurchaseItems = items;
+                window._parsedPurchaseDate = purchaseDate || new Date().toISOString().slice(0, 10);
+            }).catch(err => {
+                resultDiv.innerHTML = '<p style="color:#ef4444;font-size:12px;">AI Error: ' + err.message + '</p>';
+            });
+        }
+
+        function confirmPurchaseSave() {
+            const items = window._parsedPurchaseItems;
+            const purchaseDate = window._parsedPurchaseDate;
+            if (!items || items.length === 0) return;
+
+            const batch = db.batch();
+            const promises = [];
+
+            items.forEach(it => {
+                const purchaseRef = db.collection("raw_materials_purchase").doc();
+                batch.set(purchaseRef, {
+                    name: it.name,
+                    qty: it.qty,
+                    unit: it.unit,
+                    price: it.price,
+                    date: purchaseDate,
+                    createdAt: new Date().toISOString()
+                });
+
+                const invQuery = db.collection("inventory").where("name", "==", it.name);
+                promises.push(invQuery.get().then(snap => {
+                    if (snap.empty) {
+                        db.collection("inventory").add({
+                            name: it.name,
+                            totalPurchased: it.qty,
+                            totalUsed: 0,
+                            unit: it.unit,
+                            lastUpdated: new Date().toISOString()
+                        });
+                    } else {
+                        const doc = snap.docs[0];
+                        const existing = doc.data();
+                        db.collection("inventory").doc(doc.id).update({
+                            totalPurchased: (existing.totalPurchased || 0) + it.qty,
+                            lastUpdated: new Date().toISOString()
+                        });
+                    }
+                }));
+            });
+
+            batch.commit().then(() => {
+                return Promise.all(promises);
+            }).then(() => {
+                triggerToast("success", items.length + " items saved! Inventory updated.");
+                document.getElementById("purchaseInput").value = "";
+                document.getElementById("purchaseParseResult").innerHTML = "";
+                window._parsedPurchaseItems = null;
+            }).catch(err => {
+                triggerToast("error", "Save failed: " + err.message);
+            });
+        }
+
+        /* ========== INVENTORY RENDER ========== */
+        function renderInventory() {
+            const container = document.getElementById("inventoryContainer");
+            if (!container) return;
+            if (dbInventory.length === 0) {
+                container.innerHTML = '<p style="font-size:13px;color:var(--text-secondary);text-align:center;padding:30px;">কোনো স্টক নেই। উপরে ক্রয়ের হিসাব দিন।</p>';
+                return;
+            }
+            let html = '<div style="display:flex;flex-direction:column;gap:8px;">';
+            dbInventory.forEach(inv => {
+                const remaining = (inv.totalPurchased || 0) - (inv.totalUsed || 0);
+                const pct = inv.totalPurchased > 0 ? ((remaining / inv.totalPurchased) * 100).toFixed(0) : 0;
+                const barColor = remaining <= 0 ? '#ef4444' : pct < 30 ? '#f59e0b' : 'var(--primary-accent)';
+                html += '<div style="background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:8px;padding:10px 12px;">';
+                html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">';
+                html += '<span style="font-weight:700;font-size:13px;">' + inv.name + '</span>';
+                html += '<span style="font-size:12px;color:' + barColor + ';font-weight:700;">' + remaining + ' ' + inv.unit + ' বাকি</span>';
+                html += '</div>';
+                html += '<div style="background:rgba(255,255,255,0.05);border-radius:4px;height:6px;overflow:hidden;">';
+                html += '<div style="background:' + barColor + ';height:100%;width:' + Math.min(pct, 100) + '%;border-radius:4px;transition:width 0.3s;"></div>';
+                html += '</div>';
+                html += '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-secondary);margin-top:4px;">';
+                html += '<span>Kray: ' + inv.totalPurchased + ' ' + inv.unit + '</span><span>Byabohar: ' + inv.totalUsed + ' ' + inv.unit + '</span><span>' + pct + '% বাকি</span>';
+                html += '</div></div>';
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        /* ========== PURCHASE HISTORY ========== */
+        function renderPurchaseHistory() {
+            const container = document.getElementById("purchaseHistoryContainer");
+            if (!container) return;
+            if (dbRawMaterials.length === 0) {
+                container.innerHTML = '<p style="font-size:13px;color:var(--text-secondary);text-align:center;padding:20px;">এখনো কোনো ক্রয়ের হিসাব নেই।</p>';
+                return;
+            }
+            let html = '<div class="table-responsive"><table class="admin-table"><thead><tr><th>Date</th><th>Item</th><th>Qty</th><th>Unit</th><th>Price</th><th>Total</th><th>Action</th></tr></thead><tbody>';
+            dbRawMaterials.forEach(rm => {
+                html += '<tr><td style="font-size:12px;">' + rm.date + '</td><td style="font-weight:600;">' + rm.name + '</td><td>' + rm.qty + '</td><td>' + rm.unit + '</td><td>৳' + rm.price + '</td><td style="font-weight:700;">৳' + (rm.qty * rm.price).toLocaleString() + '</td><td><button class="btn-delete btn-small" style="padding:3px 8px;font-size:10px;" onclick="deletePurchase(\'' + rm.id + '\',\'' + rm.name + '\',' + rm.qty + ')">Delete</button></td></tr>';
+            });
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        function deletePurchase(purchaseId, name, qty) {
+            if (!confirm("এই ক্রয় ডিলিট করতে চান? Inventory থেকেও কমবে।")) return;
+            db.collection("raw_materials_purchase").doc(purchaseId).delete().then(() => {
+                const invQuery = db.collection("inventory").where("name", "==", name);
+                return invQuery.get();
+            }).then(snap => {
+                if (!snap.empty) {
+                    const doc = snap.docs[0];
+                    const existing = doc.data();
+                    return db.collection("inventory").doc(doc.id).update({
+                        totalPurchased: Math.max(0, (existing.totalPurchased || 0) - qty),
+                        lastUpdated: new Date().toISOString()
+                    });
+                }
+            }).then(() => {
+                triggerToast("success", "Purchase deleted, inventory updated.");
+            }).catch(err => {
+                triggerToast("error", "Failed: " + err.message);
+            });
+        }
+
+        /* ========== PRODUCTION VS SALES DASHBOARD ========== */
+        function refreshProdSalesDashboard() {
+            const container = document.getElementById("prodSalesDashboard");
+            if (!container) return;
+
+            const today = new Date().toISOString().slice(0, 10);
+            const monthPrefix = today.slice(0, 7);
+
+            const monthBatches = dbProductionBatches.filter(b => b.date && b.date.startsWith(monthPrefix));
+            const monthQuickSales = dbQuickSales.filter(q => q.date && q.date.startsWith(monthPrefix));
+            const monthInvoices = dbSales.filter(s => s.dateTime && s.dateTime.startsWith(monthPrefix));
+
+            const productMap = {};
+            monthBatches.forEach(b => {
+                const name = b.itemName || "Unknown";
+                if (!productMap[name]) productMap[name] = { name, made: 0, cost: 0, revenue: 0, sold: 0, left: 0, salePrice: b.salePrice || 0 };
+                productMap[name].made += b.outputQty || 0;
+                productMap[name].cost += b.totalCost || 0;
+                productMap[name].salePrice = b.salePrice || productMap[name].salePrice;
+            });
+
+            Object.keys(productMap).forEach(pName => {
+                monthQuickSales.forEach(q => {
+                    if (q.item === pName || q.name === pName || (q.itemName || "").toLowerCase() === pName.toLowerCase()) {
+                        productMap[pName].sold += q.qty || 1;
+                        productMap[pName].revenue += q.amount || 0;
+                    }
+                });
+                monthInvoices.forEach(inv => {
+                    if (inv.items) {
+                        inv.items.forEach(it => {
+                            if (it.name === pName || (it.itemName || "").toLowerCase() === pName.toLowerCase()) {
+                                productMap[pName].sold += it.qty || 1;
+                                productMap[pName].revenue += it.total || (it.price * (it.qty || 1));
+                            }
+                        });
+                    }
+                });
+            });
+
+            Object.keys(productMap).forEach(pName => {
+                const p = productMap[pName];
+                p.left = Math.max(0, p.made - p.sold);
+                p.costPerUnit = p.made > 0 ? (p.cost / p.made) : 0;
+                p.profitPerUnit = p.salePrice - p.costPerUnit;
+                p.totalProfit = p.revenue - (p.sold * p.costPerUnit);
+                p.margin = p.salePrice > 0 ? ((p.profitPerUnit / p.salePrice) * 100) : 0;
+            });
+
+            const products = Object.values(productMap);
+
+            const totalMade = products.reduce((s, p) => s + p.made, 0);
+            const totalSold = products.reduce((s, p) => s + p.sold, 0);
+            const totalLeft = products.reduce((s, p) => s + p.left, 0);
+            const totalRevenue = products.reduce((s, p) => s + p.revenue, 0);
+            const totalCost = products.reduce((s, p) => s + p.cost, 0);
+            const totalProfit = products.reduce((s, p) => s + p.totalProfit, 0);
+
+            let html = '';
+            if (products.length === 0) {
+                html = '<p style="font-size:13px;color:var(--text-secondary);text-align:center;padding:30px;">এই মাসে কোনো প্রোডাকশন নেই।</p>';
+            } else {
+                html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:15px;">';
+                html += '<div style="background:rgba(46,189,89,0.08);border-radius:10px;padding:12px;text-align:center;"><p style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;">Total Made</p><p style="font-size:20px;font-weight:800;color:var(--primary-accent);">' + totalMade + '</p></div>';
+                html += '<div style="background:rgba(59,130,246,0.08);border-radius:10px;padding:12px;text-align:center;"><p style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;">Total Sold</p><p style="font-size:20px;font-weight:800;color:#3b82f6;">' + totalSold + '</p></div>';
+                html += '<div style="background:rgba(245,158,11,0.08);border-radius:10px;padding:12px;text-align:center;"><p style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;">Remaining</p><p style="font-size:20px;font-weight:800;color:#f59e0b;">' + totalLeft + '</p></div>';
+                html += '<div style="background:rgba(139,92,246,0.08);border-radius:10px;padding:12px;text-align:center;"><p style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;">Revenue</p><p style="font-size:20px;font-weight:800;color:#8b5cf6;">৳' + totalRevenue.toLocaleString() + '</p></div>';
+                html += '<div style="background:rgba(245,158,11,0.08);border-radius:10px;padding:12px;text-align:center;"><p style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;">Total Cost</p><p style="font-size:20px;font-weight:800;color:#ef4444;">৳' + totalCost.toLocaleString() + '</p></div>';
+                html += '<div style="background:rgba(46,189,89,0.08);border-radius:10px;padding:12px;text-align:center;"><p style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;">Net Profit</p><p style="font-size:20px;font-weight:800;color:' + (totalProfit >= 0 ? 'var(--primary-accent)' : '#ef4444') + ';">৳' + totalProfit.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0}) + '</p></div>';
+                html += '</div>';
+
+                html += '<div style="overflow-x:auto;"><table class="admin-table"><thead><tr><th>Product</th><th>Made</th><th>Sold</th><th>Left</th><th>Cost/Unit</th><th>Sale Price</th><th>Revenue</th><th>Profit</th><th>Margin</th></tr></thead><tbody>';
+                products.forEach(p => {
+                    const profitColor = p.totalProfit >= 0 ? 'var(--primary-accent)' : '#ef4444';
+                    html += '<tr>';
+                    html += '<td style="font-weight:700;">' + p.name + '</td>';
+                    html += '<td>' + p.made + '</td>';
+                    html += '<td style="color:#3b82f6;font-weight:600;">' + p.sold + '</td>';
+                    html += '<td style="color:#f59e0b;font-weight:600;">' + p.left + '</td>';
+                    html += '<td>৳' + p.costPerUnit.toFixed(2) + '</td>';
+                    html += '<td>৳' + p.salePrice + '</td>';
+                    html += '<td style="font-weight:600;">৳' + p.revenue.toLocaleString() + '</td>';
+                    html += '<td style="color:' + profitColor + ';font-weight:700;">৳' + p.totalProfit.toFixed(0) + '</td>';
+                    html += '<td style="color:' + profitColor + ';">' + p.margin.toFixed(1) + '%</td>';
+                    html += '</tr>';
+                });
+                html += '<tr style="font-weight:800;background:rgba(255,255,255,0.03);"><td>TOTAL</td><td>' + totalMade + '</td><td style="color:#3b82f6;">' + totalSold + '</td><td style="color:#f59e0b;">' + totalLeft + '</td><td>-</td><td>-</td><td>৳' + totalRevenue.toLocaleString() + '</td><td style="color:' + (totalProfit >= 0 ? 'var(--primary-accent)' : '#ef4444') + ';">৳' + totalProfit.toFixed(0) + '</td><td>' + (totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(1) : 0) + '%</td></tr>';
+                html += '</tbody></table></div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        /* ==========================================================================
+           AI ASSISTANT CHAT SYSTEM — CORE ENGINE
+           ========================================================================== */
+        let _aiChatOpen = false;
+        let _aiProcessing = false;
+        let _aiPendingAction = null;
+
+        /* ========== AI AUTO-SAVE PERMISSION SYSTEM ========== */
+        const _AI_SECTIONS = {
+            "restaurant": "🍽️ Restaurant Catalog",
+            "turf": "⚽ Turf Booking",
+            "events": "🎉 Event Package",
+            "manual-booking": "📋 Manual Booking",
+            "production": "📦 Production Batch",
+            "purchase": "🛒 Purchase",
+            "expense": "💸 Expense",
+            "quicksale": "⚡ Quick Sale",
+            "homepage": "🏠 Homepage",
+            "settings": "⚙️ Web Settings",
+            "gallery": "🖼️ Gallery",
+            "due-payment": "💰 Due Collection",
+            "cash-ledger": "📒 Cash Ledger Entry",
+            "invoice-settings": "🧾 Invoice Settings",
+            "theme": "🎨 Theme Customizer",
+            "pos": "🛒 POS Desk Sale"
+        };
+        let _permDialogResolve = null;
+
+        function _getPermKey(section) {
+            return "ai_auto_save_" + section;
+        }
+
+        function _hasPerm(section) {
+            return localStorage.getItem(_getPermKey(section));
+        }
+
+        function _setPerm(section, value) {
+            localStorage.setItem(_getPermKey(section), value ? "true" : "false");
+        }
+
+        function _showPermDialog(section) {
+            return new Promise((resolve) => {
+                _permDialogResolve = resolve;
+                const label = _AI_SECTIONS[section] || section;
+                document.getElementById("aiPermSectionLabel").textContent = label;
+                document.getElementById("aiPermOverlay").classList.add("open");
+            });
+        }
+
+        function _resolvePermDialog(granted) {
+            document.getElementById("aiPermOverlay").classList.remove("open");
+            if (_permDialogResolve) {
+                _permDialogResolve(granted);
+                _permDialogResolve = null;
+            }
+        }
+
+        function _getAllPermissions() {
+            const perms = {};
+            Object.keys(_AI_SECTIONS).forEach(s => {
+                const v = localStorage.getItem(_getPermKey(s));
+                if (v !== null) perms[s] = v === "true";
+            });
+            return perms;
+        }
+
+        function _setPermFromManager(section, value) {
+            _setPerm(section, value);
+            triggerToast("info", _AI_SECTIONS[section] + " auto-save: " + (value ? "ON" : "OFF"));
+        }
+
+        function _resetAllPerms() {
+            Object.keys(_AI_SECTIONS).forEach(s => {
+                localStorage.removeItem(_getPermKey(s));
+            });
+            renderPermManager();
+            triggerToast("info", "সব AI permissions রিসেট হয়েছে।");
+        }
+
+        function renderPermManager() {
+            const container = document.getElementById("aiPermManagerGrid");
+            if (!container) return;
+            let html = "";
+            Object.keys(_AI_SECTIONS).forEach(s => {
+                const key = _getPermKey(s);
+                const checked = localStorage.getItem(key) === "true" ? "checked" : "";
+                const label = _AI_SECTIONS[s];
+                html += '<div class="ai-perm-row"><span class="ai-perm-row-label">' + label + '</span><label class="ai-perm-switch"><input type="checkbox" ' + checked + ' onchange="_setPermFromManager(\'' + s + '\', this.checked)"><span class="slider"></span></label></div>';
+            });
+            container.innerHTML = html;
+        }
+
+        function _buildAutoSaveSummary(section, data) {
+            const label = _AI_SECTIONS[section] || section;
+            let detail = "";
+            if (section === "restaurant") detail = (data.name||'?') + " — ৳" + (data.price||'?');
+            else if (section === "turf") detail = (data.name||'?') + " | " + (data.phone||'?') + " | " + (data.date||'?') + " " + (data.slot||'?');
+            else if (section === "events") detail = (data.name||'?') + " — " + (data.type||'?') + " — ৳" + (data.price||'?');
+            else if (section === "manual-booking") detail = (data.custName||'?') + " | " + (data.custPhone||'?') + " | " + (data.date||'?');
+            else if (section === "production") detail = (data.itemName||'?') + " — " + (data.outputQty||'?') + " " + (data.outputUnit||'pcs');
+            else if (section === "purchase") detail = (data.items||[]).length + " items";
+            else if (section === "expense") detail = (data.category||'?') + " — ৳" + (data.amount||'?');
+            else if (section === "quicksale") detail = "৳" + (data.amount||'?');
+            else if (section === "homepage") detail = (data.title||'?');
+            else if (section === "settings") detail = (data.name||'?') + " | " + (data.phone||'?');
+            else if (section === "gallery") detail = (data.category||'?');
+            else if (section === "due-payment") detail = (data.invoiceId||'?') + " — ৳" + (data.amount||'?') + " collected";
+            else if (section === "cash-ledger") detail = (data.source||'?') + " — ৳" + (data.amount||'?');
+            else if (section === "invoice-settings") detail = (data.businessName||'?') + " | VAT: " + (data.vatPercent||'?') + "%";
+            else if (section === "theme") detail = "Primary: " + (data.primary||'?') + " | Font: " + (data.font||'?');
+            else if (section === "pos") detail = (data.items||[]).length + " items — ৳" + (data.items||[]).reduce((s,i) => s + (parseFloat(i.qty)||0) * (parseFloat(i.price)||0), 0);
+            else detail = JSON.stringify(data).substring(0, 80);
+
+            return '<div class="ai-autosave-success">' +
+                '<div class="ai-autosave-label">⚡ ' + label + ' — অটো-সেভ হয়েছে!</div>' +
+                '<div class="ai-autosave-data"><strong>' + detail + '</strong></div>' +
+                '</div>';
+        }
+
+        /* ========== AI AUTO-SAVE: FIREBASE DIRECT WRITES ========== */
+        function _aiAutoSave(section, data) {
+            return new Promise((resolve, reject) => {
+                const today = new Date().toISOString().slice(0, 10);
+                const now = new Date();
+
+                switch(section) {
+                    case "restaurant": {
+                        const id = "fd-" + Math.floor(Math.random() * 100000);
+                        db.collection("menu").doc(id).set({
+                            name: data.name || "",
+                            category: data.category || "General",
+                            price: parseFloat(data.price) || 0,
+                            img: data.image || ""
+                        }).then(() => resolve(id)).catch(reject);
+                        break;
+                    }
+                    case "turf": {
+                        const code = "KF-" + Math.floor(100000 + Math.random() * 900000);
+                        const amount = parseFloat(data.amount) || 0;
+                        const paid = parseFloat(data.paid) || 0;
+                        const discount = parseFloat(data.discount) || 0;
+                        const total = Math.max(0, amount - discount);
+                        const due = Math.max(0, total - paid);
+                        db.collection("turf_bookings").doc(code).set({
+                            bookingCode: code,
+                            name: data.name || "",
+                            phone: data.phone || "",
+                            address: data.address || "",
+                            email: "",
+                            date: data.date || today,
+                            slot: data.slot || "",
+                            status: "approved",
+                            source: "ai-auto",
+                            price: amount, discount, paid, due, total,
+                            createdAt: now.toISOString()
+                        }).then(() => {
+                            if (paid > 0) {
+                                db.collection("ledger_incomes").doc(code).set({
+                                    source: "Turf Booking",
+                                    amount: paid, date: today,
+                                    description: "AI auto-save turf booking " + code
+                                });
+                            }
+                            resolve(code);
+                        }).catch(reject);
+                        break;
+                    }
+                    case "events": {
+                        const id = "ev-" + Math.floor(Math.random() * 100000);
+                        db.collection("events").doc(id).set({
+                            name: data.name || "",
+                            type: data.type || "Birthday",
+                            price: parseFloat(data.price) || 0,
+                            desc: data.description || ""
+                        }).then(() => resolve(id)).catch(reject);
+                        break;
+                    }
+                    case "manual-booking": {
+                        const id = "MB-" + Math.floor(Math.random() * 100000);
+                        const amount = parseFloat(data.amount) || 0;
+                        const discount = parseFloat(data.discount) || 0;
+                        const paid = parseFloat(data.paid) || 0;
+                        const total = Math.max(0, amount - discount);
+                        const due = Math.max(0, total - paid);
+                        db.collection("manual_bookings").doc(id).set({
+                            customerName: data.custName || "",
+                            customerPhone: data.custPhone || "",
+                            bookingType: data.bookingType || "turf",
+                            members: parseInt(data.members) || 1,
+                            date: data.date || today,
+                            time: data.time || "",
+                            amount, discount, total, paid, due,
+                            status: data.status || "confirmed",
+                            notes: data.notes || ""
+                        }).then(() => {
+                            if (paid > 0) {
+                                const srcLabel = (data.bookingType === 'turf') ? 'Turf Booking' : (data.bookingType === 'club') ? 'Club Booking' : 'Dining Reservation';
+                                db.collection("ledger_incomes").doc(id).set({
+                                    source: srcLabel, amount: paid, date: today,
+                                    description: "AI auto-save " + id
+                                });
+                            }
+                            resolve(id);
+                        }).catch(reject);
+                        break;
+                    }
+                    case "production": {
+                        const id = "PB-" + Math.floor(Math.random() * 100000);
+                        const ingredients = (data.ingredients || []).map(ing => ({
+                            name: ing.name || "", qty: parseFloat(ing.qty) || 0,
+                            unit: ing.unit || "kg", price: parseFloat(ing.price) || 0,
+                            lineTotal: (parseFloat(ing.qty) || 0) * (parseFloat(ing.price) || 0)
+                        }));
+                        const totalCost = ingredients.reduce((s, i) => s + i.lineTotal, 0);
+                        const outputQty = parseFloat(data.outputQty) || 0;
+                        const salePrice = parseFloat(data.salePrice) || 0;
+                        const costPerUnit = outputQty > 0 ? totalCost / outputQty : 0;
+                        const profitPerUnit = salePrice - costPerUnit;
+                        db.collection("production_batches").doc(id).set({
+                            id, itemName: data.itemName || "", date: data.date || today,
+                            ingredients, totalCost, outputQty,
+                            outputUnit: data.outputUnit || "pcs",
+                            salePrice, costPerUnit, profitPerUnit,
+                            totalProfit: profitPerUnit * outputQty,
+                            profitMargin: salePrice > 0 ? (profitPerUnit / salePrice) * 100 : 0
+                        }).then(() => resolve(id)).catch(reject);
+                        break;
+                    }
+                    case "purchase": {
+                        const items = data.items || [];
+                        const batch = db.batch();
+                        items.forEach(it => {
+                            const ref = db.collection("raw_materials_purchase").doc();
+                            batch.set(ref, {
+                                name: it.name || "", qty: parseFloat(it.qty) || 0,
+                                unit: it.unit || "kg", price: parseFloat(it.price) || 0,
+                                date: data.date || today, createdAt: now.toISOString()
+                            });
+                        });
+                        batch.commit().then(() => {
+                            const promises = items.map(it => {
+                                return db.collection("inventory").where("name", "==", it.name).get().then(snap => {
+                                    if (snap.empty) {
+                                        return db.collection("inventory").add({
+                                            name: it.name, totalPurchased: parseFloat(it.qty) || 0,
+                                            totalUsed: 0, unit: it.unit || "kg", lastUpdated: now.toISOString()
+                                        });
+                                    } else {
+                                        const doc = snap.docs[0];
+                                        return db.collection("inventory").doc(doc.id).update({
+                                            totalPurchased: (doc.data().totalPurchased || 0) + (parseFloat(it.qty) || 0),
+                                            lastUpdated: now.toISOString()
+                                        });
+                                    }
+                                });
+                            });
+                            return Promise.all(promises);
+                        }).then(() => resolve("ok")).catch(reject);
+                        break;
+                    }
+                    case "expense": {
+                        const id = "exp-" + Math.floor(Math.random() * 1000000);
+                        db.collection("ledger_expenses").doc(id).set({
+                            category: data.category || "General",
+                            amount: parseFloat(data.amount) || 0,
+                            date: data.date || today,
+                            description: data.description || "AI auto-save expense"
+                        }).then(() => resolve(id)).catch(reject);
+                        break;
+                    }
+                    case "quicksale": {
+                        const id = "qs-" + Math.floor(100000 + Math.random() * 900000);
+                        const amountVal = parseFloat(data.amount) || 0;
+                        const timeStr = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:false});
+                        db.collection("quick_sales").doc(id).set({
+                            id, amount: amountVal, date: today, time: timeStr,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                            note: data.note || "", addedBy: "AI Auto-Save"
+                        }).then(() => {
+                            return db.collection("ledger_incomes").doc(id).set({
+                                source: "Restaurant Sales (Quick Sale)", amount: amountVal,
+                                date: today, description: "AI auto-save quick sale " + id
+                            });
+                        }).then(() => resolve(id)).catch(reject);
+                        break;
+                    }
+                    case "homepage": {
+                        db.collection("homepage").doc("content").set({
+                            heroTitle: data.title || "", heroSubtitle: data.subtitle || "",
+                            heroImg: data.heroImg || "", bannerImg: data.banner || "",
+                            aboutText: data.about || ""
+                        }).then(() => resolve("content")).catch(reject);
+                        break;
+                    }
+                    case "settings": {
+                        db.collection("settings").doc("website").set({
+                            webName: data.name || "", logoUrl: data.logo || "",
+                            faviconUrl: data.favicon || "", address: data.address || "",
+                            phone: data.phone || "", email: data.email || "",
+                            mapLink: data.map || "", socials: data.socials || ""
+                        }).then(() => resolve("website")).catch(reject);
+                        break;
+                    }
+                    case "gallery": {
+                        const id = "gl-" + Math.floor(Math.random() * 100000);
+                        db.collection("gallery").doc(id).set({
+                            url: data.url || "", category: data.category || "Cafe Interior"
+                        }).then(() => resolve(id)).catch(reject);
+                        break;
+                    }
+                    case "due-payment": {
+                        const src = data.source || "";
+                        const collAmount = parseFloat(data.amount) || 0;
+                        const invoiceId = data.invoiceId || "";
+                        if (!invoiceId || collAmount <= 0) { reject(new Error("invoiceId এবং amount আবশ্যক")); return; }
+                        let target = null;
+                        let collSource = "";
+                        if (src === "Restaurant Invoice") {
+                            target = dbSales.find(s => s.invoiceNo === invoiceId);
+                            collSource = "Restaurant Sales";
+                        } else if (src === "Turf Online Booking") {
+                            target = dbTurfBookings.find(b => (b.bookingCode || b.id) === invoiceId);
+                            collSource = "Turf Booking";
+                        } else {
+                            target = dbManualBookings.find(b => b.id === invoiceId);
+                            const st = target ? target.bookingType : "turf";
+                            collSource = st === 'turf' ? 'Turf Booking' : st === 'club' ? 'Club Booking' : 'Dining Reservation';
+                        }
+                        if (!target) { reject(new Error(invoiceId + " not found")); return; }
+                        const newPaid = (target.paid || 0) + collAmount;
+                        const newDue = Math.max(0, (target.due || 0) - collAmount);
+                        const collCol = (src === "Restaurant Invoice") ? "sales" : (src === "Turf Online Booking") ? "turf_bookings" : "manual_bookings";
+                        db.collection(collCol).doc(invoiceId).update({ paid: newPaid, due: newDue }).then(() => {
+                            const incId = "inc-" + Math.floor(Math.random() * 100000);
+                            return db.collection("ledger_incomes").doc(incId).set({
+                                source: collSource, amount: collAmount,
+                                date: new Date().toISOString().slice(0, 10),
+                                description: "AI auto-save due collection for " + invoiceId
+                            });
+                        }).then(() => resolve(invoiceId)).catch(reject);
+                        break;
+                    }
+                    case "cash-ledger": {
+                        const incId = "inc-" + Math.floor(Math.random() * 100000);
+                        db.collection("ledger_incomes").doc(incId).set({
+                            source: data.source || "Direct Income",
+                            amount: parseFloat(data.amount) || 0,
+                            date: data.date || today,
+                            description: data.description || "AI auto-save cash ledger entry"
+                        }).then(() => resolve(incId)).catch(reject);
+                        break;
+                    }
+                    case "invoice-settings": {
+                        db.collection("settings").doc("invoice").set({
+                            businessName: data.businessName || "",
+                            address: data.address || "",
+                            phone: data.phone || "",
+                            logo: data.logo || "",
+                            footerMsg: data.footerMsg || "",
+                            vatPercent: parseFloat(data.vatPercent) || 0,
+                            invoicePrefix: data.invoicePrefix || "",
+                            discountRefs: data.discountRefs || ""
+                        }).then(() => resolve("invoice")).catch(reject);
+                        break;
+                    }
+                    case "theme": {
+                        db.collection("settings").doc("theme").set({
+                            primary: data.primary || "#10b981",
+                            secondary: data.secondary || "#1e293b",
+                            button: data.button || "#10b981",
+                            background: data.background || "#0f172a",
+                            font: data.font || "Inter"
+                        }).then(() => resolve("theme")).catch(reject);
+                        break;
+                    }
+                    case "pos": {
+                        const posId = "qs-" + Math.floor(100000 + Math.random() * 900000);
+                        const posItems = data.items || [];
+                        const posTotal = posItems.reduce((s, i) => s + (parseFloat(i.qty) || 0) * (parseFloat(i.price) || 0), 0);
+                        const posDiscount = parseFloat(data.discount) || 0;
+                        const posFinal = Math.max(0, posTotal - posDiscount);
+                        const posPaid = parseFloat(data.paid) || posFinal;
+                        const posTime = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:false});
+                        db.collection("quick_sales").doc(posId).set({
+                            id: posId, amount: posFinal, date: today, time: posTime,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                            note: "POS: " + posItems.map(i => i.name + " x" + i.qty).join(", ") + (data.customerName ? " | " + data.customerName : ""),
+                            addedBy: data.customerName || "POS Desk"
+                        }).then(() => {
+                            return db.collection("ledger_incomes").doc(posId).set({
+                                source: "Restaurant Sales (POS)", amount: posPaid,
+                                date: today,
+                                description: "AI auto-save POS sale " + posId + " (" + (data.paymentMethod || "cash") + ")"
+                            });
+                        }).then(() => resolve(posId)).catch(reject);
+                        break;
+                    }
+                    default:
+                        reject(new Error("Unknown section: " + section));
+                }
+            });
+        }
+
+        function toggleAIChat() {
+            _aiChatOpen = !_aiChatOpen;
+            document.getElementById("ai-chat-panel").classList.toggle("open", _aiChatOpen);
+            document.getElementById("aiOverlay").classList.toggle("open", _aiChatOpen);
+            const btn = document.getElementById("ai-chat-btn");
+            if (_aiChatOpen) {
+                btn.classList.remove("pulse");
+                document.getElementById("aiChatInput").focus();
+            } else {
+                btn.classList.add("pulse");
+            }
+        }
+
+        function quickAIMsg(msg) {
+            document.getElementById("aiChatInput").value = msg;
+            sendAIMessage();
+        }
+
+        function _appendChatMsg(type, html) {
+            const body = document.getElementById("aiChatBody");
+            const div = document.createElement("div");
+            div.className = "ai-msg ai-msg-" + type;
+            if (type === "ai") {
+                div.innerHTML = '<div class="ai-msg-label">AI Assistant</div>' + html;
+            } else {
+                div.innerHTML = html;
+            }
+            body.appendChild(div);
+            body.scrollTop = body.scrollHeight;
+            return div;
+        }
+
+        function _showAILoading() {
+            return _appendChatMsg("ai", '<div class="ai-msg-loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span style="font-size:12px;color:var(--text-secondary);margin-left:4px;">AI প্রসেস করছে...</span></div>');
+        }
+
+        function sendAIMessage() {
+            if (_aiProcessing) return;
+            const input = document.getElementById("aiChatInput");
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            _appendChatMsg("user", msg.replace(/</g,"&lt;"));
+            input.value = "";
+            input.style.height = "42px";
+
+            const provider = dbAISettings.provider || "openrouter";
+            let apiKey, model;
+            if (provider === "openrouter") {
+                apiKey = dbAISettings.openRouterKey;
+                model = dbAISettings.openRouterModel || "google/gemini-3.5-flash";
+            } else {
+                apiKey = dbAISettings.googleKey;
+                model = dbAISettings.googleModel || "gemini-3.5-flash";
+            }
+            if (!apiKey) {
+                _appendChatMsg("ai", "⚠️ AI Settings এ API Key সেট করুন। <strong>AI Settings</strong> ট্যাবে গিয়ে Key দিন।");
+                return;
+            }
+
+            _aiProcessing = true;
+            document.getElementById("aiSendBtn").disabled = true;
+            const loader = _showAILoading();
+
+            const systemPrompt = _buildAISystemPrompt();
+            const userPayload = _buildAIUserPayload(msg);
+
+            const fullPrompt = systemPrompt + "\n\n--- ইউজারের মেসেজ ---\n" + userPayload;
+
+            const callOpenRouter = (k, m) => {
+                return fetch("https://openrouter.ai/api/v1/chat/completions", {
+                    method: "POST",
+                    headers: { "Authorization": "Bearer " + k, "Content-Type": "application/json", "HTTP-Referer": window.location.origin },
+                    body: JSON.stringify({ model: m, messages: [{ role: "user", content: fullPrompt }], max_tokens: 1500, temperature: 0.15 })
+                }).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+                  .then(d => d.choices?.[0]?.message?.content || "");
+            };
+
+            const callGoogleAI = (k, m) => {
+                return fetch("https://generativelanguage.googleapis.com/v1beta/models/" + m + ":generateContent", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "x-goog-api-key": k },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: fullPrompt }] }], generationConfig: { maxOutputTokens: 1500, temperature: 0.15 } })
+                }).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+                  .then(d => d.candidates?.[0]?.content?.parts?.[0]?.text || "");
+            };
+
+            const apiCall = provider === "openrouter" ? callOpenRouter(apiKey, model) : callGoogleAI(apiKey, model);
+
+            apiCall.then(responseText => {
+                loader.remove();
+                let jsonStr = responseText;
+                const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+                if (jsonMatch) jsonStr = jsonMatch[0];
+
+                let parsed;
+                try {
+                    parsed = JSON.parse(jsonStr);
+                } catch(e) {
+                    _appendChatMsg("ai", "AI থেকে JSON parse করা যায়নি। আবার চেষ্টা করুন।<br><pre style='font-size:11px;color:var(--text-secondary);white-space:pre-wrap;margin-top:6px;'>" + responseText.substring(0,500) + "</pre>");
+                    _aiProcessing = false;
+                    document.getElementById("aiSendBtn").disabled = false;
+                    return;
+                }
+
+                if (!parsed.section || parsed.section === "general" || !parsed.action) {
+                    const aiMsg = parsed.message || parsed.reply || "বুঝেছি! কিন্তু কোন সেকশনে কাজ করতে হবে তা উল্লেখ করুন।";
+                    _appendChatMsg("ai", aiMsg);
+                    _aiProcessing = false;
+                    document.getElementById("aiSendBtn").disabled = false;
+                    return;
+                }
+
+                _showAIPreview(parsed, msg);
+                _aiProcessing = false;
+                document.getElementById("aiSendBtn").disabled = false;
+            }).catch(err => {
+                loader.remove();
+                _appendChatMsg("ai", "❌ AI Error: " + err.message);
+                _aiProcessing = false;
+                document.getElementById("aiSendBtn").disabled = false;
+            });
+        }
+
+        function _buildAISystemPrompt() {
+            const today = new Date().toISOString().slice(0, 10);
+            const menuNames = dbMenu.map(m => m.name).join(", ") || "কোনো menu item নেই";
+            const categories = dbCategories.join(", ") || "কোনো ক্যাটাগরি নেই";
+            const turfSlots = dbTurfSet.slots || "কোনো slot config নেই";
+            const turfRate = dbTurfSet.pricing || "N/A";
+            const eventTypes = "Wedding, Birthday, Corporate";
+
+            return `তুমি Cafe.98 Admin Panel এর AI Data Entry Assistant। ইউজারের বাংলা/ইংরেজি মেসেজ থেকে ডেটা এন্ট্রি বুঝো এবং নিচের JSON format এ output দাও। শুধু JSON output দাও, অন্য কিছু না।
+
+Output JSON format:
+{
+  "section": "<section_name>",
+  "action": "<action_type>",
+  "data": { ... relevant fields ... },
+  "message": "বাংলায় সারসংক্ষেপ (1-2 লাইন)"
+}
+
+section গুলো হতে পারে:
+- "restaurant" → Restaurant Catalog: menu item যোগ
+  data: { name, category, price, image }
+  category options: ${categories}
+
+- "turf" → Turf Booking
+  data: { name, phone, date, slot, amount, paid, discount, address, status }
+  turf rate per hour: ৳${turfRate}
+  available slots format: ${turfSlots}
+
+- "events" → Event Package
+  data: { name, type, price, description }
+  type options: ${eventTypes}
+
+- "manual-booking" → Manual Reservation
+  data: { custName, custPhone, bookingType, members, date, time, amount, discount, paid, status, notes }
+  bookingType options: turf, club, table
+
+- "production" → Production Batch Entry
+  data: { itemName, date, ingredients: [{name, qty, unit, price}], outputQty, outputUnit, salePrice }
+  outputUnit options: pcs, kg, packet, liter
+
+- "purchase" → Raw Material Purchase
+  data: { date, items: [{name, qty, unit, price}] }
+
+- "expense" → Expense Entry
+  data: { category, amount, date, description }
+  (category must match existing expense categories or "General")
+
+- "quicksale" → Quick Sale
+  data: { amount, note }
+
+- "homepage" → Homepage Content Update
+  data: { title, subtitle, heroImg, banner, about }
+
+- "settings" → Web Settings Update
+  data: { name, phone, email, address, logo, favicon, map, socials }
+
+- "gallery" → Gallery Image
+  data: { url, category }
+  category options: Cafe Interior, Turf Field Action, Special Ceremonies, Food & Beverages
+
+- "due-payment" → Due Payment Collection
+  data: { invoiceId, source, amount }
+  source options: Restaurant Invoice, Turf Online Booking, Manual Booking
+  (invoiceId = the invoiceNo/bookingCode to collect due from, source = origin type, amount = cash collected)
+
+- "cash-ledger" → Direct Cash Ledger Income Entry
+  data: { source, amount, date, description }
+  source options: Restaurant Sales, Turf Booking, Manual Booking, Direct Income, Other
+
+- "invoice-settings" → Invoice/Receipt Settings Update
+  data: { businessName, address, phone, logo, footerMsg, vatPercent, invoicePrefix, discountRefs }
+
+- "theme" → Theme Customizer Update
+  data: { primary, secondary, button, background, font }
+
+- "pos" → POS Desk Sale (Restaurant billing)
+  data: { items: [{name, qty, price}], discount, paid, paymentMethod, customerName, customerPhone }
+  paymentMethod options: cash, bKash, Nagad, card
+
+নিয়ম:
+- তারিখ না দিলে আজকের দিন ব্যবহার করো: ${today}
+- ফোন নম্বর number হিসেবে রাখো, + বা spaces বাদ দাও
+- ৳, কমা বাদ দিয়ে শুধু number রাখো
+- Section不确定 হলে user-কে জিজ্ঞেস করো (section: "general")
+- ingredients/items array আছে কিনা তা check করো
+- একটি মেসেজে একাধিক কাজ থাকলে primary একটি select করো
+- due-payment: invoiceId না জানলে user-কে জিজ্ঞেস করো
+
+বর্তমান DB তথ্য:
+- Menu items: ${menuNames}
+- Categories: ${categories}
+- Turf rate: ৳${turfRate}/hour
+- Event types: ${eventTypes}
+- Pending Dues: ${dbSales.filter(s => s.due > 0).length + dbTurfBookings.filter(b => b.due > 0).length + dbManualBookings.filter(b => b.due > 0).length} items
+- Recent Expenses: ${(dbAccounting.expenses || []).slice(-3).map(e => e.category + " ৳" + e.amount).join("; ") || "None"}`;
+        }
+
+        function _buildAIUserPayload(userMsg) {
+            const activeTab = document.querySelector(".tab-pane.active-pane")?.id?.replace("tab-","") || "unknown";
+            const recentBookings = dbTurfBookings.slice(-3).map(b => b.name + " " + b.date + " " + b.slot).join("; ") || "None";
+            const recentSales = dbQuickSales.slice(-3).map(q => q.amount + " " + q.date).join("; ") || "None";
+
+            return `বর্তমান ট্যাব: ${activeTab}
+সাম্প্রতিক বুকিং: ${recentBookings}
+সাম্প্রতিক সেলস: ${recentSales}
+আজকের তারিখ: ${new Date().toISOString().slice(0,10)}
+
+ইউজার বলেছে: ${userMsg}`;
+        }
+
+        function _showAIPreview(parsed, originalMsg) {
+            const sectionLabels = {
+                "restaurant": "🍽️ Restaurant Catalog",
+                "turf": "⚽ Turf Booking",
+                "events": "🎉 Event Package",
+                "manual-booking": "📋 Manual Reservation",
+                "production": "📦 Production Batch",
+                "purchase": "🛒 Raw Material Purchase",
+                "expense": "💸 Expense Entry",
+                "quicksale": "⚡ Quick Sale",
+                "homepage": "🏠 Homepage Content",
+                "settings": "⚙️ Web Settings",
+                "gallery": "🖼️ Gallery Image",
+                "general": "💬 General Query"
+            };
+            const sectionLabel = sectionLabels[parsed.section] || parsed.section;
+            const data = parsed.data || {};
+            const section = parsed.section;
+
+            if (section && section !== "general") {
+                const permVal = _hasPerm(section);
+
+                if (permVal === null) {
+                    _showPermDialog(section).then(granted => {
+                        _setPerm(section, granted);
+                        if (granted) {
+                            _doAutoSave(parsed, sectionLabel);
+                        } else {
+                            _showPreviewCard(parsed, sectionLabel, data, sectionLabels);
+                        }
+                    });
+                    _appendChatMsg("ai", "⏳ <strong>" + sectionLabel + "</strong> — প্রথমবার ব্যবহার। অনুমতি দিন...");
+                    return;
+                }
+
+                if (permVal === "true") {
+                    _doAutoSave(parsed, sectionLabel);
+                    return;
+                }
+            }
+
+            _showPreviewCard(parsed, sectionLabel, data, sectionLabels);
+        }
+
+        function _doAutoSave(parsed, sectionLabel) {
+            const section = parsed.section;
+            const data = parsed.data || {};
+            const loadingMsg = _appendChatMsg("ai", '<div class="ai-msg-loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span style="font-size:12px;color:var(--primary-accent);margin-left:4px;">⚡ ' + sectionLabel + ' অটো-সেভ করছে...</span></div>');
+
+            _aiAutoSave(section, data).then(id => {
+                loadingMsg.remove();
+                const summaryHtml = _buildAutoSaveSummary(section, data);
+                _appendChatMsg("ai", summaryHtml);
+            }).catch(err => {
+                loadingMsg.remove();
+                _appendChatMsg("ai", "❌ অটো-সেভ ব্যর্থ: " + err.message + "<br><button class='ai-btn-confirm' style='margin-top:8px;padding:6px 12px;border-radius:8px;font-size:11px;border:none;cursor:pointer;background:var(--primary-accent);color:#fff;' onclick='_retryAsPreview(" + JSON.stringify(encodeURIComponent(JSON.stringify(parsed))) + ")'>↻ Preview দেখাও</button>");
+            });
+        }
+
+        function _retryAsPreview(encodedParsed) {
+            try {
+                const parsed = JSON.parse(decodeURIComponent(encodedParsed));
+                const sectionLabels = { "restaurant": "🍽️ Restaurant Catalog", "turf": "⚽ Turf Booking", "events": "🎉 Event Package", "manual-booking": "📋 Manual Reservation", "production": "📦 Production Batch", "purchase": "🛒 Raw Material Purchase", "expense": "💸 Expense Entry", "quicksale": "⚡ Quick Sale", "homepage": "🏠 Homepage Content", "settings": "⚙️ Web Settings", "gallery": "🖼️ Gallery Image", "due-payment": "💰 Due Collection", "cash-ledger": "📒 Cash Ledger", "invoice-settings": "🧾 Invoice Settings", "theme": "🎨 Theme Customizer", "pos": "🛒 POS Desk", "general": "💬 General Query" };
+                _showPreviewCard(parsed, sectionLabels[parsed.section] || parsed.section, parsed.data || {}, sectionLabels);
+            } catch(e) { /* ignore */ }
+        }
+
+        function _showPreviewCard(parsed, sectionLabel, data, sectionLabels) {
+            let previewRows = "";
+            if (parsed.section === "purchase" && data.items) {
+                data.items.forEach(it => {
+                    previewRows += '<div class="ai-msg-preview-row"><span class="k">' + (it.name||'?') + ' ' + (it.qty||'?') + ' ' + (it.unit||'kg') + '</span><span class="v">৳' + (it.price||0) + '</span></div>';
+                });
+                const total = data.items.reduce((s,i) => s + ((i.qty||0)*(i.price||0)), 0);
+                previewRows += '<div class="ai-msg-preview-row" style="border-top:1px dashed var(--glass-border);margin-top:4px;padding-top:6px;"><span class="k" style="font-weight:700;">Total</span><span class="v" style="color:var(--primary-accent);">৳' + total + '</span></div>';
+            } else if (parsed.section === "production" && data.ingredients) {
+                previewRows += '<div class="ai-msg-preview-row"><span class="k">Product</span><span class="v">' + (data.itemName||'?') + '</span></div>';
+                previewRows += '<div class="ai-msg-preview-row"><span class="k">Output</span><span class="v">' + (data.outputQty||'?') + ' ' + (data.outputUnit||'pcs') + '</span></div>';
+                previewRows += '<div class="ai-msg-preview-row"><span class="k">Sale Price</span><span class="v">৳' + (data.salePrice||'?') + '/unit</span></div>';
+                data.ingredients.forEach(ing => {
+                    previewRows += '<div class="ai-msg-preview-row"><span class="k" style="padding-left:10px;">' + (ing.name||'?') + ' ' + (ing.qty||'?') + ' ' + (ing.unit||'kg') + '</span><span class="v">৳' + (ing.price||0) + '</span></div>';
+                });
+            } else {
+                Object.keys(data).forEach(k => {
+                    if (data[k] !== null && data[k] !== undefined && data[k] !== "" && !(Array.isArray(data[k]) && data[k].length === 0)) {
+                        const val = Array.isArray(data[k]) ? data[k].join(", ") : data[k];
+                        previewRows += '<div class="ai-msg-preview-row"><span class="k">' + k + '</span><span class="v">' + val + '</span></div>';
+                    }
+                });
+            }
+
+            const aiMsg = parsed.message || "ডেটা প্রস্তুত!";
+
+            const previewHtml = `
+                <div style="margin-bottom:6px; font-weight:700; color:var(--primary-accent); font-size:12px;">${sectionLabel}</div>
+                <div style="font-size:12px; color:var(--text-secondary); margin-bottom:8px;">${aiMsg}</div>
+                <div class="ai-msg-preview-box">${previewRows || '<div style="font-size:12px;color:var(--text-secondary);">কোনো specific data পাওয়া যায়নি</div>'}</div>
+                <div class="ai-msg-actions">
+                    <button class="ai-btn-confirm" onclick="confirmAIPreview()">✓ Confirm & Fill</button>
+                    <button class="ai-btn-cancel" onclick="cancelAIPreview()">✕ Cancel</button>
+                </div>
+            `;
+
+            const msgDiv = _appendChatMsg("ai", previewHtml);
+            _aiPendingAction = { parsed: parsed, element: msgDiv };
+        }
+
+        function confirmAIPreview() {
+            if (!_aiPendingAction) return;
+            const { parsed, element } = _aiPendingAction;
+            const actionsEl = element.querySelector(".ai-msg-actions");
+            if (actionsEl) actionsEl.innerHTML = '<span style="font-size:12px;color:var(--primary-accent);font-weight:600;">✓ Filling form...</span>';
+
+            _aiNavigateAndFill(parsed.section, parsed.data);
+
+            setTimeout(() => {
+                if (actionsEl) actionsEl.innerHTML = '<span style="font-size:12px;color:var(--primary-accent);font-weight:600;">✓ Form filled! Review & Save.</span>';
+            }, 500);
+
+            _aiPendingAction = null;
+        }
+
+        function cancelAIPreview() {
+            if (_aiPendingAction) {
+                const actionsEl = _aiPendingAction.element.querySelector(".ai-msg-actions");
+                if (actionsEl) actionsEl.innerHTML = '<span style="font-size:12px;color:var(--text-secondary);">✕ Cancelled</span>';
+            }
+            _aiPendingAction = null;
+        }
+
+        function _aiNavigateAndFill(section, data) {
+            const tabMap = {
+                "restaurant": "restaurant",
+                "turf": "turf",
+                "events": "events",
+                "manual-booking": "manual-booking",
+                "production": "production-costing",
+                "purchase": "production-costing",
+                "expense": "expenses",
+                "quicksale": "quicksale",
+                "homepage": "homepage",
+                "settings": "settings",
+                "gallery": "gallery",
+                "due-payment": "dues",
+                "cash-ledger": "accounting",
+                "invoice-settings": "invoice-settings",
+                "theme": "theme",
+                "pos": "pos"
+            };
+            const targetTab = tabMap[section] || section;
+            navigateToTab(targetTab);
+
+            setTimeout(() => {
+                switch(section) {
+                    case "restaurant": _fillRestaurantForm(data); break;
+                    case "turf": _fillTurfForm(data); break;
+                    case "events": _fillEventForm(data); break;
+                    case "manual-booking": _fillManualBookingForm(data); break;
+                    case "production": _fillProductionForm(data); break;
+                    case "purchase": _fillPurchaseData(data); break;
+                    case "expense": _fillExpenseForm(data); break;
+                    case "quicksale": _fillQuickSaleForm(data); break;
+                    case "homepage": _fillHomepageForm(data); break;
+                    case "settings": _fillSettingsForm(data); break;
+                    case "gallery": _fillGalleryForm(data); break;
+                    case "due-payment": _fillDuePaymentForm(data); break;
+                    case "cash-ledger": _fillCashLedgerForm(data); break;
+                    case "invoice-settings": _fillInvoiceSettingsForm(data); break;
+                    case "theme": _fillThemeForm(data); break;
+                    case "pos": _fillPOSForm(data); break;
+                }
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }, 300);
+        }
+
+        /* ========== SECTION-SPECIFIC FORM FILLERS ========== */
+
+        function _fillRestaurantForm(d) {
+            if (d.name) document.getElementById("foodName").value = d.name;
+            if (d.category) document.getElementById("foodCategory").value = d.category;
+            if (d.price) document.getElementById("foodPrice").value = d.price;
+            if (d.image) document.getElementById("foodImg").value = d.image;
+            triggerToast("success", "AI: Restaurant form auto-filled! Review & Save.");
+        }
+
+        function _fillTurfForm(d) {
+            if (d.date) document.getElementById("qtbDate").value = d.date;
+            if (d.name) document.getElementById("qtbName").value = d.name;
+            if (d.phone) document.getElementById("qtbPhone").value = d.phone;
+            if (d.address) document.getElementById("qtbAddress").value = d.address;
+            if (d.amount) document.getElementById("qtbAmount").value = d.amount;
+            if (d.paid !== undefined) document.getElementById("qtbPaid").value = d.paid;
+            if (d.discount !== undefined) document.getElementById("qtbDiscount").value = d.discount;
+            if (d.status) {
+                const statusMap = { "pending": "turfFilterPending", "approved": "turfFilterApproved", "rejected": "turfFilterRejected" };
+                const btnId = statusMap[d.status];
+                if (btnId) filterTurfBookings(d.status);
+            }
+            if (d.slot) {
+                const slotSelect = document.getElementById("qtbSlot");
+                if (slotSelect) {
+                    let found = false;
+                    for (let opt of slotSelect.options) {
+                        if (opt.value === d.slot || opt.text.includes(d.slot)) {
+                            opt.selected = true;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found && slotSelect.options.length > 0) {
+                        for (let opt of slotSelect.options) {
+                            if (opt.text.toLowerCase().includes((d.slot||"").toLowerCase().split(" ")[0])) {
+                                opt.selected = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            if (d.amount) calcQuickTurfTotal();
+            triggerToast("success", "AI: Turf booking form auto-filled!");
+        }
+
+        function _fillEventForm(d) {
+            if (d.name) document.getElementById("eventPkgName").value = d.name;
+            if (d.type) document.getElementById("eventPkgType").value = d.type;
+            if (d.price) document.getElementById("eventPkgPrice").value = d.price;
+            if (d.description) document.getElementById("eventPkgDesc").value = d.description;
+            triggerToast("success", "AI: Event package form auto-filled!");
+        }
+
+        function _fillManualBookingForm(d) {
+            if (d.custName) document.getElementById("mbCustName").value = d.custName;
+            if (d.custPhone) document.getElementById("mbCustPhone").value = d.custPhone;
+            if (d.bookingType) document.getElementById("mbBookingType").value = d.bookingType;
+            if (d.members) document.getElementById("mbMembers").value = d.members;
+            if (d.date) document.getElementById("mbDate").value = d.date;
+            if (d.time) document.getElementById("mbTime").value = d.time;
+            if (d.amount) document.getElementById("mbAmount").value = d.amount;
+            if (d.discount !== undefined) document.getElementById("mbDiscount").value = d.discount;
+            if (d.paid !== undefined) document.getElementById("mbPaid").value = d.paid;
+            if (d.status) document.getElementById("mbStatus").value = d.status;
+            if (d.notes) document.getElementById("mbNotes").value = d.notes;
+            if (d.amount || d.discount || d.paid) calculateBookingTotals();
+            triggerToast("success", "AI: Manual booking form auto-filled!");
+        }
+
+        function _fillProductionForm(d) {
+            if (d.itemName) document.getElementById("prodItemName").value = d.itemName;
+            if (d.date) document.getElementById("prodBatchDate").value = d.date;
+            if (d.outputQty) document.getElementById("prodOutputQty").value = d.outputQty;
+            if (d.outputUnit) document.getElementById("prodOutputUnit").value = d.outputUnit;
+            if (d.salePrice) document.getElementById("prodSalePricePerUnit").value = d.salePrice;
+
+            const container = document.getElementById("ingredientsRowsContainer");
+            container.innerHTML = "";
+            if (d.ingredients && d.ingredients.length > 0) {
+                d.ingredients.forEach(ing => {
+                    addIngredientRow({ name: ing.name, qty: ing.qty, unit: ing.unit, price: ing.price });
+                });
+            } else {
+                addIngredientRow();
+            }
+            if (d.outputQty || d.salePrice) calculateProductionLivePreview();
+            document.getElementById("productionFormTitle").innerText = "AI Auto-Generated Batch Entry";
+            document.getElementById("resetProdBtn").style.display = "inline-flex";
+            triggerToast("success", "AI: Production batch form auto-filled!");
+        }
+
+        function _fillPurchaseData(d) {
+            if (!d.items || d.items.length === 0) return;
+            const dateInput = document.getElementById("purchaseDate");
+            if (d.date) dateInput.value = d.date;
+
+            let textContent = "";
+            d.items.forEach(it => {
+                textContent += it.name + " " + it.qty + " " + (it.unit||"kg") + " ৳" + it.price + "\n";
+            });
+            document.getElementById("purchaseInput").value = textContent.trim();
+            triggerToast("success", "AI: Purchase data filled! Click 'AI Parse & Save Purchase' to process.");
+        }
+
+        function _fillExpenseForm(d) {
+            if (d.category) {
+                const catSelect = document.getElementById("expDedCategory");
+                let found = false;
+                for (let opt of catSelect.options) {
+                    if (opt.value === d.category || opt.text.toLowerCase() === d.category.toLowerCase()) {
+                        catSelect.value = opt.value;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found && catSelect.options.length > 0) {
+                    for (let opt of catSelect.options) {
+                        if (opt.text.toLowerCase().includes(d.category.toLowerCase())) {
+                            catSelect.value = opt.value;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (d.amount) document.getElementById("expDedAmount").value = d.amount;
+            if (d.date) document.getElementById("expDedDate").value = d.date;
+            if (d.description) document.getElementById("expDedDesc").value = d.description;
+            triggerToast("success", "AI: Expense form auto-filled!");
+        }
+
+        function _fillQuickSaleForm(d) {
+            if (d.amount) document.getElementById("quickSaleAmountInput").value = d.amount;
+            if (d.note) document.getElementById("quickSaleNoteInput").value = d.note;
+            triggerToast("success", "AI: Quick Sale form filled! Click Save.");
+        }
+
+        function _fillHomepageForm(d) {
+            if (d.title) document.getElementById("hpTitle").value = d.title;
+            if (d.subtitle) document.getElementById("hpSubtitle").value = d.subtitle;
+            if (d.heroImg) document.getElementById("hpHeroImg").value = d.heroImg;
+            if (d.banner) document.getElementById("hpBanner").value = d.banner;
+            if (d.about) document.getElementById("hpAbout").value = d.about;
+            triggerToast("success", "AI: Homepage content form auto-filled!");
+        }
+
+        function _fillSettingsForm(d) {
+            if (d.name) document.getElementById("setWebName").value = d.name;
+            if (d.phone) document.getElementById("setPhone").value = d.phone;
+            if (d.email) document.getElementById("setEmail").value = d.email;
+            if (d.address) document.getElementById("setAddress").value = d.address;
+            if (d.logo) document.getElementById("setLogo").value = d.logo;
+            if (d.favicon) document.getElementById("setFavicon").value = d.favicon;
+            if (d.map) document.getElementById("setMap").value = d.map;
+            if (d.socials) document.getElementById("setSocials").value = d.socials;
+            triggerToast("success", "AI: Settings form auto-filled!");
+        }
+
+        function _fillGalleryForm(d) {
+            if (d.url) document.getElementById("galleryImgUrl").value = d.url;
+            if (d.category) document.getElementById("galleryCategory").value = d.category;
+            triggerToast("success", "AI: Gallery form auto-filled!");
+        }
+
+        function _fillDuePaymentForm(d) {
+            triggerToast("info", "AI: Due Management — কোনো form auto-fill নেই। Auto-save directly কাজ করবে।");
+        }
+
+        function _fillCashLedgerForm(d) {
+            triggerToast("info", "AI: Cash Ledger — কোনো form auto-fill নেই। Auto-save directly কাজ করবে।");
+        }
+
+        function _fillInvoiceSettingsForm(d) {
+            if (d.businessName) document.getElementById("invBusinessName").value = d.businessName;
+            if (d.address) document.getElementById("invAddress").value = d.address;
+            if (d.phone) document.getElementById("invPhone").value = d.phone;
+            if (d.logo) document.getElementById("invLogo").value = d.logo;
+            if (d.footerMsg) document.getElementById("invFooterMsg").value = d.footerMsg;
+            if (d.vatPercent !== undefined) document.getElementById("invVatPercent").value = d.vatPercent;
+            if (d.invoicePrefix) document.getElementById("invPrefix").value = d.invoicePrefix;
+            if (d.discountRefs) document.getElementById("invDiscountRefs").value = d.discountRefs;
+            triggerToast("success", "AI: Invoice settings form auto-filled! Review & Save.");
+        }
+
+        function _fillThemeForm(d) {
+            if (d.primary) document.getElementById("thmPrimary").value = d.primary;
+            if (d.secondary) document.getElementById("thmSecondary").value = d.secondary;
+            if (d.button) document.getElementById("thmButton").value = d.button;
+            if (d.background) document.getElementById("thmBackground").value = d.background;
+            if (d.font) document.getElementById("thmFont").value = d.font;
+            triggerToast("success", "AI: Theme settings form auto-filled! Review & Save.");
+        }
+
+        function _fillPOSForm(d) {
+            triggerToast("info", "AI: POS Desk — কোনো form auto-fill নেই। Auto-save directly কাজ করবে।");
+        }
+
+        /* ========== AUTO-RESIZE TEXTAREA ========== */
+        document.addEventListener("DOMContentLoaded", function() {
+            const aiInput = document.getElementById("aiChatInput");
+            if (aiInput) {
+                aiInput.addEventListener("input", function() {
+                    this.style.height = "42px";
+                    this.style.height = Math.min(this.scrollHeight, 120) + "px";
+                });
+            }
+        });
     </script>
 </body>
 </html>
